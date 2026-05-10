@@ -1,0 +1,3903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NextPen 极简笔记</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        :root {
+            --primary-color: #6200EE;
+            --bg-color: #FFFFFF;
+            --text-color: #1D1D1F;
+            --secondary-text: #8E8E93;
+            --border-color: #E5E5EA;
+            --card-bg: #F9F9FB;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+            --card-gap: 8px;
+            --grid-card-width: 120px;
+            --grid-card-height: 120px;
+            --card-border-width: 2px;
+            --content-line-height: 1.6;
+        }
+        /* 莫奈新UI主题 */
+        .theme-monet {
+            --primary-color: #7BA7D7;
+            --bg-color: #F5F1E8;
+            --text-color: #2D3142;
+            --secondary-text: #718096;
+            --border-color: #D6D8E0;
+            --card-bg: #FFFFFF;
+            --border-radius: 16px;
+        }
+        .dark-mode.theme-monet {
+            --bg-color: #1A202C;
+            --text-color: #E2E8F0;
+            --secondary-text: #A0AEC0;
+            --border-color: #2D3748;
+            --card-bg: #2D3748;
+        }
+        /* 极简主题 */
+        .theme-minimal {
+            --primary-color: #333333;
+            --bg-color: #FFFFFF;
+            --text-color: #222222;
+            --secondary-text: #666666;
+            --border-color: #EEEEEE;
+            --card-bg: #FAFAFA;
+            --border-radius: 4px;
+        }
+        .dark-mode.theme-minimal {
+            --bg-color: #111111;
+            --text-color: #EEEEEE;
+            --secondary-text: #999999;
+            --border-color: #333333;
+            --card-bg: #1A1A1A;
+        }
+        /* 复古主题 */
+        .theme-retro {
+            --primary-color: #8B4513;
+            --bg-color: #F5E6D3;
+            --text-color: #3C2A21;
+            --secondary-text: #7D5A4F;
+            --border-color: #D4B898;
+            --card-bg: #F9EFE3;
+            --border-radius: 8px;
+        }
+        .dark-mode.theme-retro {
+            --bg-color: #2C1810;
+            --text-color: #E8D5C4;
+            --secondary-text: #A67C52;
+            --border-color: #4A2C20;
+            --card-bg: #3A2419;
+        }
+        /* 护眼主题 */
+        .theme-eye-care {
+            --primary-color: #4A7C59;
+            --bg-color: #E8F5E9;
+            --text-color: #2E4A33;
+            --secondary-text: #6B8E6F;
+            --border-color: #C8E6C9;
+            --card-bg: #F1F8F2;
+            --border-radius: 12px;
+        }
+        .dark-mode.theme-eye-care {
+            --bg-color: #1A2E20;
+            --text-color: #C8E6C9;
+            --secondary-text: #81C784;
+            --border-color: #2E5938;
+            --card-bg: #243B2B;
+        }
+        .dark-mode {
+            --bg-color: #1C1C1E;
+            --text-color: #F5F5F7;
+            --secondary-text: #8E8E93;
+            --border-color: #3A3A3C;
+            --card-bg: #2C2C2E;
+        }
+        .round-screen {
+            padding: 14.6% !important;
+        }
+        .round-screen-ui .card {
+            border-radius: 50%;
+        }
+        .round-screen-ui .btn {
+            border-radius: 50%;
+        }
+        .round-screen-ui .list-item {
+            border-radius: 24px;
+        }
+        .wearos-theme {
+            --border-radius: 16px;
+        }
+        .frosted-glass .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.7) !important;
+        }
+        .dark-mode.frosted-glass .card {
+            background: rgba(44,44,46,0.7) !important;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: var(--transition);
+            overflow-x: hidden;
+            padding: 12px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        html {
+            font-size: 16px;
+        }
+        .night-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .night-warm {
+            filter: sepia(20%) brightness(0.9);
+        }
+        .night-anti-blue {
+            filter: sepia(15%) saturate(80%);
+        }
+        .page {
+            display: none;
+            min-height: calc(100vh - 24px);
+            flex-direction: column;
+        }
+        .page.active {
+            display: flex;
+        }
+        /* Transition animations */
+        @keyframes fadeDefault {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadePop {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeCard {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeNonlinear {
+            from { opacity: 0; transform: translateX(-30px) rotate(-2deg); }
+            to { opacity: 1; transform: translateX(0) rotate(0); }
+        }
+        .page.anim-default {
+            animation: fadeDefault 0.3s ease;
+        }
+        .page.anim-fade {
+            animation: fadeFade 0.3s ease;
+        }
+        .page.anim-pop {
+            animation: fadePop 0.3s ease;
+        }
+        .page.anim-card {
+            animation: fadeCard 0.3s ease;
+        }
+        .page.anim-nonlinear {
+            animation: fadeNonlinear 0.4s ease;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+        .header-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        .app-name {
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: var(--primary-color);
+        }
+        .app-name:hover {
+            opacity: 0.8;
+        }
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.625rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+        .btn-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: currentColor;
+        }
+        .list {
+            flex: 1;
+            overflow-y: auto;
+            gap: var(--card-gap);
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 3.75rem;
+        }
+        .settings-group {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .settings-group-title {
+            font-size: 0.8125rem;
+            color: var(--secondary-text);
+            padding: 0.5rem 0.75rem 0.25rem;
+        }
+        .list-item {
+            background: transparent;
+            padding: 0.875rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .list-item:hover {
+            opacity: 0.9;
+            transform: scale(1.01);
+        }
+        .list-item svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: var(--primary-color);
+            flex-shrink: 0;
+        }
+        .list-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .list-item-title {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            margin-bottom: 0.125rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .list-item-subtitle {
+            font-size: 0.8125rem;
+            color: var(--secondary-text);
+        }
+        .note-item {
+            background: var(--card-bg);
+            padding: 0.875rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            overflow: hidden;
+        }
+        .note-item:hover {
+            opacity: 0.9;
+        }
+        .note-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .note-item-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .note-item-preview {
+            font-size: 0.8125rem;
+            color: var(--secondary-text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .note-item-action {
+            flex-shrink: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .note-item-action:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .dark-mode .note-item-action:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .note-item-action svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: var(--secondary-text);
+        }
+        .note-item-actions {
+            flex-shrink: 0;
+            display: flex;
+            gap: 0.25rem;
+        }
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            margin-bottom: 0.375rem;
+            color: var(--secondary-text);
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.9375rem;
+            transition: var(--transition);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .file-input-hidden {
+            display: none;
+        }
+        textarea {
+            min-height: 12.5rem;
+            resize: none;
+            flex: 1;
+            white-space: pre-wrap;
+        }
+        .toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+        }
+        .toggle-label {
+            font-size: 0.9375rem;
+        }
+        .switch {
+            position: relative;
+            width: 3.125rem;
+            height: 1.875rem;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 1.875rem;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 1.375rem;
+            width: 1.375rem;
+            left: 0.25rem;
+            bottom: 0.25rem;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(1.25rem);
+        }
+        .slider-group {
+            padding: 0.75rem 0;
+        }
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .slider-group input[type="range"] {
+            height: 0.375rem;
+            padding: 0;
+            -webkit-appearance: none;
+            background: var(--border-color);
+            border-radius: 0.1875rem;
+        }
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+        .password-inputs {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .password-input {
+            width: 3rem;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .fab {
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.15);
+            transition: var(--transition);
+        }
+        .fab svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: currentColor;
+        }
+        .fab:hover {
+            transform: scale(1.05);
+        }
+        .search-box {
+            margin-bottom: 0.75rem;
+        }
+        #searchResults, #noteSearchResults, #settingsSearchResults {
+            margin-top: 0.5rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .search-result-item {
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            transition: var(--transition);
+        }
+        .search-result-item:hover {
+            background: rgba(98, 0, 238, 0.1);
+        }
+        .virtual-back {
+            position: fixed;
+            bottom: 1.25rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            padding: 0.625rem 1.25rem;
+            border-radius: 1.25rem;
+            display: none;
+            align-items: center;
+            gap: 0.375rem;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 0.875rem;
+        }
+        .virtual-back.show {
+            display: flex;
+        }
+        /* 悬浮球 */
+        .float-ball {
+            position: fixed;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: opacity 0.3s;
+        }
+        .float-ball svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: currentColor;
+        }
+        .click-effect-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary-color);
+            opacity: 0.3;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .click-effect-star {
+            position: absolute;
+            pointer-events: none;
+            animation: starFly 0.8s ease-out forwards;
+        }
+        @keyframes starFly {
+            to {
+                transform: translateY(-2.5rem);
+                opacity: 0;
+            }
+        }
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .minimal-exit {
+            text-align: center;
+            padding: 0.75rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+        .about-content {
+            padding: 1rem;
+            text-align: center;
+        }
+        .about-title {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .about-version {
+            font-size: 0.875rem;
+            color: var(--secondary-text);
+            margin-bottom: 1.5rem;
+        }
+        .about-changelog {
+            text-align: left;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.8125rem;
+            line-height: 1.6;
+        }
+        .about-changelog h4 {
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        .about-changelog ul {
+            padding-left: 1.25rem;
+            color: var(--secondary-text);
+        }
+        mark {
+            background-color: rgba(98, 0, 238, 0.3);
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        #readContent {
+            flex: 1;
+            font-size: var(--content-font-size, 15px);
+            font-weight: var(--content-font-weight, 400);
+            color: var(--content-color, #1D1D1F);
+            line-height: var(--content-line-height, 1.6);
+            overflow-y: auto;
+            white-space: pre-wrap;
+            padding: var(--note-margin, 0);
+        }
+        /* 卡片描边样式 */
+        .card-border-enabled .note-item {
+            border: var(--card-border-width, 2px) solid var(--border-color);
+        }
+        /* 网格布局 */
+        #noteList.grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--card-gap, 8px);
+        }
+        #noteList.grid .note-item {
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: var(--grid-card-height, 120px);
+            width: 100%;
+            max-width: var(--grid-card-width, 100%);
+        }
+        #noteList.grid .note-item-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+        /* 文件夹样式 */
+        .folder-item {
+            background: var(--card-bg);
+            padding: 0.875rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 2px dashed var(--border-color);
+        }
+        .folder-item:hover {
+            opacity: 0.9;
+            border-color: var(--primary-color);
+        }
+        .folder-item svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: var(--primary-color);
+            flex-shrink: 0;
+        }
+        .folder-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .folder-item-title {
+            font-size: 1rem;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .folder-item-count {
+            font-size: 0.8125rem;
+            color: var(--secondary-text);
+        }
+        .folder-expanded {
+            margin-left: 1rem;
+            border-left: 2px solid var(--primary-color);
+            padding-left: 0.5rem;
+        }
+        /* 关怀模式样式 */
+        .care-mode .list {
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            flex-direction: row !important;
+            scroll-snap-type: x mandatory;
+        }
+        .care-mode .list-item,
+        .care-mode .note-item,
+        .care-mode .folder-item {
+            min-width: calc(100% - var(--card-gap)) !important;
+            width: calc(100% - var(--card-gap)) !important;
+            flex-shrink: 0 !important;
+            scroll-snap-align: start;
+        }
+        .care-mode .toggle-label,
+        .care-mode .input-group label {
+            font-size: 1.1rem !important;
+        }
+        .care-mode input,
+        .care-mode select {
+            font-size: 1.1rem !important;
+            padding: 1rem !important;
+        }
+        .theme-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .theme-preset {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+        .theme-preset.active {
+            border-color: var(--primary-color);
+        }
+        .theme-preset:hover {
+            transform: scale(1.02);
+        }
+        .preset-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .preset-schemes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        .scheme-item {
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            transition: var(--transition);
+        }
+        .scheme-item:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG Icons -->
+    <svg style="display: none;">
+        <symbol id="icon-lock" viewBox="0 0 24 24">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24,7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+        </symbol>
+        <symbol id="icon-eye" viewBox="0 0 24 24">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24 5-5s-2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+        </symbol>
+        <symbol id="icon-storage" viewBox="0 0 24 24">
+            <path d="M2 20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z" />
+        </symbol>
+        <symbol id="icon-palette" viewBox="0 0 24 24">
+            <path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c1.38 0 2.5-1.12 2.5-2.5 0-.61-.23-1.2-.64-1.67-.08-.1-.13-.21-.13-.33 0-.28.22-.5.5-.5H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 7 6.5 7 8 7.67 8 8.5 7.33 11 6.5 11zm3-4C8.67 7 8 6.33 8 5.5S8.67 4 9.5 4s1.5.67 1.5 1.5S10.33 7 9.5 7zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4 14.5 4s1.5.67 1.5 1.5S15.33 7 14.5 7zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 8 17.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+        </symbol>
+        <symbol id="icon-gesture" viewBox="0 0 24 24">
+            <path d="M3 13.5V10a1 1 0 0 1 2 0v3.5h1V6a1 1 0 0 1 2 0v7.5h1V4a1 1 0 0 1 2 0v9.5h1V7a1 1 0 0 1 2 0v6.5c0 2.76-2.24 5-5 5s-5-2.24-5-5z" />
+        </symbol>
+        <symbol id="icon-note" viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+        </symbol>
+        <symbol id="icon-settings" viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.31.06-.94.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c.59.24-1.13.57-1.62.94l-2.39-.96c.22-.08.47 0 .59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+        </symbol>
+        <symbol id="icon-more" viewBox="0 0 24 24">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2 2-2 2-2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+        </symbol>
+        <symbol id="icon-back" viewBox="0 0 24 24">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+        </symbol>
+        <symbol id="icon-add" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+        </symbol>
+        <symbol id="icon-folder" viewBox="0 0 24 24">
+            <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+        </symbol>
+        <symbol id="icon-wrench" viewBox="0 0 24 24">
+            <path d="M20.7 17.78l-3.54-3.54c.9-2.03.27-4.52-1.54-6.34-1.8-1.81-4.31-2.44-6.34-1.54L5.58 4.22C4.81 3.45 3.54 3.45 2.76 4.22c-.78.78-.78 2.05 0 2.83L6.22 10.7c.82.82 2.05.82 2.83 0l1.54-1.54c.38-.38.71-.81.99-1.27.39.66.59 1.42.59 2.11 0 1.38-.56 3.6l3.54 3.54c.78.78 2.05.78 2.83 0 .79-.78.79-2.04.01-2.83zM6.5 17.5l-2 2 1.5 1.5 2-2 1.5 1.5-2 2 1.5 1.5 2-2 1.5 1.5-2 2 1.5 1.5 2-2-1.5-1.5 2-2-1.5-1.5-2 2-1.5-1.5 2-2-1.5-1.5-2 2z" />
+        </symbol>
+        <symbol id="icon-pencil" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+        </symbol>
+        <symbol id="icon-info" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v4z" />
+        </symbol>
+        <symbol id="icon-trash" viewBox="0 0 24 24">
+            <path d="M6 19c0 1.1 0 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+        </symbol>
+        <symbol id="icon-flask" viewBox="0 0 24 24">
+            <path d="M18 14h-5V4h1V2H8v2h1v10H6v-2H4v2h1v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6h1v-2z" />
+        </symbol>
+        <symbol id="icon-chart" viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+        </symbol>
+        <symbol id="icon-theme" viewBox="0 0 24 24">
+            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 11.5 6.5 11.5zm3-4C8.67 7.5 8 6.83 8 6s.67-1.5 1.5-1.5S11 5.17 11 6s-.67 1.5-1.5 1.5zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4.5 14.5 4.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+        </symbol>
+    </svg>
+    <!-- Night Mask -->
+    <div id="nightMask" class="night-mask"></div>
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+    <!-- 悬浮球 -->
+    <div id="floatBall" class="float-ball" style="display: none;">
+        <svg><use href="#icon-back"></use></svg>
+    </div>
+    <!-- Home Page -->
+    <div id="page-home" class="page active">
+        <div class="header" id="homeHeader">
+            <button class="btn btn-icon" id="btnMore">
+                <svg><use href="#icon-more"></use></svg>
+            </button>
+            <div></div>
+        </div>
+        <div class="app-name" id="appName">NextPen</div>
+        
+        <div id="minimalExit" class="minimal-exit" style="display: none;">点击退出极简模式</div>
+        
+        <div id="searchBox" class="search-box" style="display: none;">
+            <input type="text" id="searchInput" placeholder="搜索笔记...">
+            <div id="searchResults" style="display: none;"></div>
+        </div>
+        <div class="list" id="noteList">
+            <!-- Notes will be loaded here -->
+        </div>
+        <button class="fab" id="btnNewFolder" style="right: 5.25rem; display: none;">
+            <svg><use href="#icon-folder"></use></svg>
+        </button>
+        <button class="fab" id="btnNewNote">
+            <svg><use href="#icon-add"></use></svg>
+        </button>
+    </div>
+    <!-- More Menu Page -->
+    <div id="page-more" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackMore">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">更多</div>
+            <div></div>
+        </div>
+        <div class="search-box">
+            <input type="text" id="settingsSearchInput" placeholder="搜索设置选项...">
+            <div id="settingsSearchResults" style="display: none;"></div>
+        </div>
+        <div class="list">
+            <div class="list-item" data-page="privacy">
+                <svg><use href="#icon-lock"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">隐私空间</div>
+                    <div class="list-item-subtitle">保护你的私密笔记</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="display">
+                <svg><use href="#icon-eye"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">显示</div>
+                    <div class="list-item-subtitle">调整屏幕显示效果</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="theme-beta">
+                <svg><use href="#icon-theme"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">主题 Beta</div>
+                    <div class="list-item-subtitle">自定义主题与配色方案</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="data">
+                <svg><use href="#icon-storage"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">数据</div>
+                    <div class="list-item-subtitle">备份与恢复你的数据</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="personalization">
+                <svg><use href="#icon-palette"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">个性化</div>
+                    <div class="list-item-subtitle">自定义你的应用外观</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="gesture">
+                <svg><use href="#icon-gesture"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">手势</div>
+                    <div class="list-item-subtitle">调整交互手势设置</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="note-settings">
+                <svg><use href="#icon-note"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">笔记</div>
+                    <div class="list-item-subtitle">笔记样式与排版设置</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="lab">
+                <svg><use href="#icon-flask"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">实验室</div>
+                    <div class="list-item-subtitle">实验性功能与高级选项</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="more-settings">
+                <svg><use href="#icon-settings"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">更多设置</div>
+                    <div class="list-item-subtitle">其他高级设置选项</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="stats">
+                <svg><use href="#icon-chart"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">统计</div>
+                    <div class="list-item-subtitle">数据统计与字数统计</div>
+                </div>
+            </div>
+            <div class="list-item" data-page="about">
+                <svg><use href="#icon-info"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">关于</div>
+                    <div class="list-item-subtitle">应用信息与更新内容</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Theme Beta Page -->
+    <div id="page-theme-beta" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackTheme">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">主题 Beta</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="settings-group">
+                <div class="settings-group-title">预设主题</div>
+                <div class="theme-presets">
+                    <div class="theme-preset" data-theme="default" style="background: #F9F9FB;">
+                        <div class="preset-name">默认</div>
+                    </div>
+                    <div class="theme-preset" data-theme="monet" style="background: #F5F1E8;">
+                        <div class="preset-name">莫奈</div>
+                    </div>
+                    <div class="theme-preset" data-theme="minimal" style="background: #FAFAFA;">
+                        <div class="preset-name">极简</div>
+                    </div>
+                    <div class="theme-preset" data-theme="retro" style="background: #F5E6D3;">
+                        <div class="preset-name">复古</div>
+                    </div>
+                    <div class="theme-preset" data-theme="eye-care" style="background: #E8F5E9;">
+                        <div class="preset-name">护眼</div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">场景方案</div>
+                <div class="preset-schemes">
+                    <div class="scheme-item" data-scheme="work">工作模式</div>
+                    <div class="scheme-item" data-scheme="read">阅读模式</div>
+                    <div class="scheme-item" data-scheme="eye">护眼模式</div>
+                </div>
+                <button class="btn btn-secondary" id="btnSaveScheme" style="width: 100%; margin-top: 0.75rem;">保存当前配置为新方案</button>
+            </div>
+        </div>
+    </div>
+    <!-- Privacy Settings Page -->
+    <div id="page-privacy" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackPrivacy">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">隐私空间</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div id="privacyHint" style="padding: 0.75rem; background: var(--card-bg); border-radius: var(--border-radius); margin-bottom: 1rem; display: none;">
+                <p style="font-size: 0.8125rem; color: var(--secondary-text);">提示：开启隐私空间后，点击主页的NextPen应用名称即可输入密码进入隐私空间。</p>
+            </div>
+            <div class="input-group">
+                <label>设置4位密码</label>
+                <input type="password" id="privacyPassword" maxlength="4" placeholder="输入4位数字密码">
+            </div>
+            <button class="btn" id="btnSetPassword" style="width: 100%; margin-bottom: 0.75rem;">设置密码</button>
+            <button class="btn btn-secondary" id="btnResetPassword" style="width: 100%; margin-bottom: 0.75rem;">重设密码</button>
+            <button class="btn btn-secondary" id="btnForgotPassword" style="width: 100%;">忘记密码（清空隐私数据）</button>
+        </div>
+    </div>
+    <!-- Display Settings Page -->
+    <div id="page-display" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackDisplay">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">显示</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="settings-group">
+                <div class="settings-group-title">夜间模式</div>
+                <div class="toggle">
+                    <span class="toggle-label">夜间模式</span>
+                    <label class="switch">
+                        <input type="checkbox" id="nightMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="slider-group" id="nightOpacityGroup">
+                    <label>
+                        <span>亮度遮罩不透明度</span>
+                        <span id="nightOpacityValue">30%</span>
+                    </label>
+                    <input type="range" min="0" max="80" value="30" id="nightOpacity">
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">暖色调</span>
+                    <label class="switch">
+                        <input type="checkbox" id="nightWarmTone">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">防蓝光模式</span>
+                    <label class="switch">
+                        <input type="checkbox" id="nightAntiBlue">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">屏幕设置</div>
+                <div class="slider-group">
+                    <label>
+                        <span>屏幕DPI缩放</span>
+                        <span id="dpiValue">100%</span>
+                    </label>
+                    <input type="range" min="70" max="150" value="100" id="dpi">
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>卡片间距</span>
+                        <span id="cardGapValue">8px</span>
+                    </label>
+                    <input type="range" min="0" max="30" value="8" id="cardGap">
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">自适应屏幕模式</span>
+                    <label class="switch">
+                        <input type="checkbox" id="adaptiveScreen">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">适配圆形屏幕</span>
+                    <label class="switch">
+                        <input type="checkbox" id="roundScreen">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>主页按钮位置</label>
+                    <select id="fabPosition">
+                        <option value="right">靠右显示</option>
+                        <option value="center">居中显示</option>
+                        <option value="left">靠左显示</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Data Settings Page -->
+    <div id="page-data" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackData">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">数据</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <button class="btn" id="btnCopyData" style="width: 100%; margin-bottom: 0.75rem;">复制所有数据</button>
+            <div class="input-group">
+                <label>导入数据</label>
+                <textarea id="importData" placeholder="粘贴你的数据文本..."></textarea>
+            </div>
+            <button class="btn" id="btnImportData" style="width: 100%; margin-bottom: 0.75rem;">导入数据</button>
+            <button class="btn btn-secondary" id="btnClearData" style="width: 100%;">清空所有数据</button>
+        </div>
+    </div>
+    <!-- Personalization Settings Page -->
+    <div id="page-personalization" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackPersonal">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">个性化</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="settings-group">
+                <div class="settings-group-title">基础外观</div>
+                <div class="input-group">
+                    <label>主题色</label>
+                    <input type="color" id="themeColor" value="#6200EE">
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">深色模式</span>
+                    <label class="switch">
+                        <input type="checkbox" id="darkMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">WearOS主题</span>
+                    <label class="switch">
+                        <input type="checkbox" id="wearOsTheme">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">毛玻璃效果</span>
+                    <label class="switch">
+                        <input type="checkbox" id="frostedGlass">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">壁纸设置</div>
+                <div class="input-group">
+                    <label>上传壁纸</label>
+                    <input type="file" id="wallpaperInput" accept="image/*,.webp,.gif" class="file-input-hidden">
+                    <button class="btn btn-secondary" id="btnWallpaperInput" style="width: 100%;">选择壁纸</button>
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>壁纸模糊程度</span>
+                        <span id="wallpaperBlurValue">0px</span>
+                    </label>
+                    <input type="range" min="0" max="20" value="0" id="wallpaperBlur">
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>壁纸透明度</span>
+                        <span id="wallpaperOpacityValue">100%</span>
+                    </label>
+                    <input type="range" min="0" max="100" value="100" id="wallpaperOpacity">
+                </div>
+                <div class="input-group">
+                    <label>壁纸显示方式</label>
+                    <select id="wallpaperDisplay">
+                        <option value="cover">拉伸填充</option>
+                        <option value="repeat">平铺</option>
+                        <option value="center">居中</option>
+                    </select>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">支持动态壁纸</span>
+                    <label class="switch">
+                        <input type="checkbox" id="dynamicWallpaper">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>定时切换壁纸</label>
+                    <select id="wallpaperAutoSwitch">
+                        <option value="0">关闭</option>
+                        <option value="3600000">每小时</option>
+                        <option value="86400000">每天</option>
+                        <option value="604800000">每周</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">UI样式</div>
+                <div class="slider-group">
+                    <label>
+                        <span>UI圆角程度</span>
+                        <span id="radiusValue">12px</span>
+                    </label>
+                    <input type="range" min="0" max="30" value="12" id="borderRadius">
+                </div>
+                <div class="input-group">
+                    <label>点击特效</label>
+                    <select id="clickEffect">
+                        <option value="none">无</option>
+                        <option value="ripple">涟漪</option>
+                        <option value="star">星星</option>
+                        <option value="emoji">自定义Emoji</option>
+                    </select>
+                </div>
+                <div class="input-group" id="emojiInputGroup" style="display: none;">
+                    <label>自定义Emoji</label>
+                    <input type="text" id="customEmoji" maxlength="2" placeholder="输入Emoji">
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">笔记显示</div>
+                <div class="input-group">
+                    <label>主页笔记显示模式</label>
+                    <select id="noteDisplayMode">
+                        <option value="list">列表显示</option>
+                        <option value="grid">3x3卡片显示</option>
+                    </select>
+                </div>
+                <div class="slider-group" id="gridCardWidthGroup">
+                    <label>
+                        <span>3x3卡片宽度</span>
+                        <span id="gridCardWidthValue">120px</span>
+                    </label>
+                    <input type="range" min="80" max="200" value="120" id="gridCardWidth">
+                </div>
+                <div class="slider-group" id="gridCardHeightGroup">
+                    <label>
+                        <span>3x3卡片高度</span>
+                        <span id="gridCardHeightValue">120px</span>
+                    </label>
+                    <input type="range" min="80" max="200" value="120" id="gridCardHeight">
+                </div>
+                <div class="input-group">
+                    <label>正文预览字数</label>
+                    <input type="number" min="1" max="100" value="10" id="previewContentLength" placeholder="默认10">
+                </div>
+                <div class="input-group">
+                    <label>标题预览字数</label>
+                    <input type="number" min="1" max="100" value="10" id="previewTitleLength" placeholder="默认10">
+                </div>
+            </div>
+            <button class="btn btn-secondary" id="btnResetPersonal" style="width: 100%;">重置个性化配置</button>
+        </div>
+    </div>
+    <!-- Gesture Settings Page -->
+    <div id="page-gesture" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackGesture">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">手势</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="settings-group">
+                <div class="settings-group-title">返回手势</div>
+                <div class="toggle">
+                    <span class="toggle-label">右滑返回</span>
+                    <label class="switch">
+                        <input type="checkbox" id="swipeBack" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">底部虚拟返回按键</span>
+                    <label class="switch">
+                        <input type="checkbox" id="virtualBack">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">返回手势提示</span>
+                    <label class="switch">
+                        <input type="checkbox" id="swipeBackHint" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>右滑返回检测区域</span>
+                        <span id="swipeAreaValue">50px</span>
+                    </label>
+                    <input type="range" min="20" max="100" value="50" id="swipeBackArea">
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">悬浮球</div>
+                <div class="toggle">
+                    <span class="toggle-label">启用悬浮球</span>
+                    <label class="switch">
+                        <input type="checkbox" id="floatBallEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>长按动作</label>
+                    <select id="floatBallLongPress">
+                        <option value="more">打开更多设置</option>
+                        <option value="new">新建笔记</option>
+                        <option value="search">搜索</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Note Settings Page -->
+    <div id="page-note-settings" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackNoteSettings">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">笔记</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="settings-group">
+                <div class="settings-group-title">标题样式</div>
+                <div class="input-group">
+                    <label>全局标题颜色</label>
+                    <input type="color" id="titleColor" value="#1D1D1F">
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>全局标题字体大小</span>
+                        <span id="titleSizeValue">16px</span>
+                    </label>
+                    <input type="range" min="12" max="24" value="16" id="titleFontSize">
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">全局标题字体加粗</span>
+                    <label class="switch">
+                        <input type="checkbox" id="titleFontWeight" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">正文样式</div>
+                <div class="input-group">
+                    <label>全局正文颜色</label>
+                    <input type="color" id="contentColor" value="#1D1D1F">
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>全局正文字体大小</span>
+                        <span id="contentSizeValue">15px</span>
+                    </label>
+                    <input type="range" min="12" max="20" value="15" id="contentFontSize">
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>正文行间距</span>
+                        <span id="noteLineHeightValue">1.6</span>
+                    </label>
+                    <input type="range" min="1.0" max="3.0" step="0.1" value="1.6" id="noteLineHeight">
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>阅读页边距</span>
+                        <span id="noteMarginValue">0px</span>
+                    </label>
+                    <input type="range" min="0" max="40" value="0" id="noteMargin">
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">全局正文字体加粗</span>
+                    <label class="switch">
+                        <input type="checkbox" id="contentFontWeight">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">阅读背景</div>
+                <div class="input-group">
+                    <label>全局阅读笔记背景</label>
+                    <select id="noteBgType">
+                        <option value="white">默认白色</option>
+                        <option value="black">默认黑色</option>
+                        <option value="macaron">马卡龙色系</option>
+                        <option value="color">自定义颜色</option>
+                        <option value="gradient">自定义渐变</option>
+                        <option value="image">自定义图片</option>
+                    </select>
+                </div>
+                <div class="input-group" id="noteBgColorGroup" style="display: none;">
+                    <label>背景颜色</label>
+                    <input type="color" id="noteBgColor" value="#FFFFFF">
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">阅读功能</div>
+                <div class="toggle">
+                    <span class="toggle-label">笔记内关键词搜索</span>
+                    <label class="switch">
+                        <input type="checkbox" id="noteSearchEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">搜索时显示上下文</span>
+                    <label class="switch">
+                        <input type="checkbox" id="searchShowContext" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">阅读信息栏</span>
+                    <label class="switch">
+                        <input type="checkbox" id="readInfoEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>阅读模式</label>
+                    <select id="readMode">
+                        <option value="scroll">滑动模式</option>
+                        <option value="page">翻页模式</option>
+                    </select>
+                </div>
+                <div class="input-group" id="pageWordCountGroup" style="display: none;">
+                    <label>翻页模式每页字数</label>
+                    <input type="number" min="100" max="5000" value="500" id="pageWordCount">
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">标题仅在第一页显示</span>
+                    <label class="switch">
+                        <input type="checkbox" id="titleOnlyFirstPage">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Lab Page -->
+    <div id="page-lab" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackLab">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">实验室</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="settings-group">
+                <div class="settings-group-title">字体定制</div>
+                <div class="input-group">
+                    <label>字体选择</label>
+                    <select id="fontFamily">
+                        <option value="system">系统默认</option>
+                        <option value="Source Han Sans CN">思源黑体</option>
+                        <option value="Microsoft YaHei">微软雅黑</option>
+                        <option value="SimSun">宋体</option>
+                        <option value="KaiTi">楷体</option>
+                    </select>
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>字体大小</span>
+                        <span id="fontSizeValue">100%</span>
+                    </label>
+                    <input type="range" min="80" max="150" value="100" id="fontSize">
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>全局行高</span>
+                        <span id="globalLineHeightValue">1.6</span>
+                    </label>
+                    <input type="range" min="1.0" max="3.0" step="0.1" value="1.6" id="globalLineHeight">
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">卡片功能</div>
+                <div class="toggle">
+                    <span class="toggle-label">卡片描边</span>
+                    <label class="switch">
+                        <input type="checkbox" id="cardBorder">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>卡片描边粗细</span>
+                        <span id="cardBorderWidthValue">2px</span>
+                    </label>
+                    <input type="range" min="1" max="10" value="2" id="cardBorderWidth">
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">文件夹功能</div>
+                <div class="toggle">
+                    <span class="toggle-label">文件夹功能</span>
+                    <label class="switch">
+                        <input type="checkbox" id="folderEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="input-group" id="folderInputGroup" style="display: none;">
+                    <label>新建文件夹</label>
+                    <input type="text" id="newFolderName" placeholder="输入文件夹名称">
+                    <button class="btn" style="width: 100%; margin-top: 0.5rem;" id="btnAddFolder">添加文件夹</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">UI实验</div>
+                <div class="toggle">
+                    <span class="toggle-label">新UI测试（莫奈色）</span>
+                    <label class="switch">
+                        <input type="checkbox" id="newUiEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">圆形屏幕专属UI</span>
+                    <label class="switch">
+                        <input type="checkbox" id="roundScreenUI">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">关怀模式</span>
+                    <label class="switch">
+                        <input type="checkbox" id="careMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">新图标文字优化</span>
+                    <label class="switch">
+                        <input type="checkbox" id="newIconMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">阅读背景</div>
+                <div class="input-group">
+                    <label>上传阅读背景图片</label>
+                    <input type="file" id="readBgInput" accept="image/*" class="file-input-hidden">
+                    <button class="btn btn-secondary" id="btnReadBgInput" style="width: 100%;">选择阅读背景图片</button>
+                    <div id="readBgPreview" style="margin-top: 0.5rem; font-size: 0.8125rem; color: var(--secondary-text);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- More Settings Page -->
+    <div id="page-more-settings" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackMoreSettings">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">更多设置</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="settings-group">
+                <div class="settings-group-title">界面显示</div>
+                <div class="toggle">
+                    <span class="toggle-label">显示应用名称</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showAppName" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">显示极简退出提示</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showMinimalExit" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">显示新建文件夹按钮</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showNewFolderBtn" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">模式设置</div>
+                <div class="toggle">
+                    <span class="toggle-label">极简模式</span>
+                    <label class="switch">
+                        <input type="checkbox" id="minimalMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span class="toggle-label">搜索笔记功能</span>
+                    <label class="switch">
+                        <input type="checkbox" id="searchEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">字体设置</div>
+                <div class="slider-group">
+                    <label>
+                        <span>全局字体大小</span>
+                        <span id="globalFontSizeValue">100%</span>
+                    </label>
+                    <input type="range" min="80" max="150" value="100" id="globalFontSize">
+                </div>
+                <div class="input-group">
+                    <label>全局字体样式(.ttf文件)</label>
+                    <input type="file" id="globalFontInput" accept=".ttf" class="file-input-hidden">
+                    <button class="btn btn-secondary" id="btnFontInput" style="width: 100%;">选择字体文件</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">动画设置</div>
+                <div class="toggle">
+                    <span class="toggle-label">过渡动画</span>
+                    <label class="switch">
+                        <input type="checkbox" id="transitionAnimation" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>过渡动画样式</label>
+                    <select id="transitionStyle">
+                        <option value="default">默认</option>
+                        <option value="fade">淡出淡入</option>
+                        <option value="pop">弹出</option>
+                        <option value="card">卡片弹出</option>
+                        <option value="nonlinear">非线性动画</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">表冠设置</div>
+                <div class="toggle">
+                    <span class="toggle-label">表冠旋转</span>
+                    <label class="switch">
+                        <input type="checkbox" id="crownEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="slider-group">
+                    <label>
+                        <span>表冠滚动速度</span>
+                        <span id="crownSpeedValue">1.0x</span>
+                    </label>
+                    <input type="range" min="0.01" max="100" step="0.01" value="1.0" id="crownScrollSpeed">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Stats Page -->
+    <div id="page-stats" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackStats">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">统计</div>
+            <div></div>
+        </div>
+        <div class="list">
+            <div class="list-item">
+                <svg><use href="#icon-note"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">普通笔记数量</div>
+                    <div class="list-item-subtitle" id="statNormalNotes">0</div>
+                </div>
+            </div>
+            <div class="list-item">
+                <svg><use href="#icon-lock"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">隐私笔记数量</div>
+                    <div class="list-item-subtitle" id="statPrivateNotes">0</div>
+                </div>
+            </div>
+            <div class="list-item">
+                <svg><use href="#icon-chart"></use></svg>
+                <div class="list-item-content">
+                    <div class="list-item-title">总文本字数</div>
+                    <div class="list-item-subtitle" id="statTotalWords">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- About Page -->
+    <div id="page-about" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackAbout">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">关于</div>
+            <div></div>
+        </div>
+        <div class="about-content">
+            <div class="about-title">NextPen</div>
+            <div class="about-version">版本 1.6.0</div>
+            <div class="about-changelog">
+                <h4>更新内容</h4>
+                <ul>
+                    <li>新增主题Beta功能，支持默认、莫奈、极简、复古、护眼等预设主题一键切换</li>
+                    <li>新增字体定制功能，支持调整字体及相关样式，适配不同阅读习惯</li>
+                    <li>个性化设置新增壁纸透明度、显示方式、动态壁纸、定时切换壁纸</li>
+                    <li>设置页面升级，每个功能单独卡片，更易查找</li>
+                    <li>新增设置搜索功能，快速定位设置选项</li>
+                    <li>新增界面元素隐藏/显示设置，可隐藏应用名称、退出提示等</li>
+                    <li>新增圆形屏幕专属UI，适配圆形设备</li>
+                    <li>关怀模式优化，自动开启大字体+高对比度，适配老年用户</li>
+                    <li>新增悬浮球功能，替代物理按钮，适配大屏/单手操作</li>
+                    <li>新增重置个性化配置按钮，误调后可一键恢复</li>
+                    <li>新增场景方案保存，支持工作/阅读/护眼等模式一键切换</li>
+                    <li>笔记设置新增行间距、页边距调节</li>
+                    <li>夜间模式新增暖色调、防蓝光模式</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Note Page -->
+    <div id="page-edit" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackEdit">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-icon" id="btnNoteStyle">
+                    <svg><use href="#icon-wrench"></use></svg>
+                </button>
+                <button class="btn" id="btnSaveNote">保存</button>
+            </div>
+        </div>
+        <input type="text" id="editTitle" placeholder="笔记标题">
+        <textarea id="editContent" placeholder="开始记录你的想法..."></textarea>
+        <input type="hidden" id="editNoteId">
+    </div>
+    <!-- Note Style Settings Page -->
+    <div id="page-note-style" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackNoteStyle">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">笔记样式</div>
+            <button class="btn" id="btnSaveNoteStyle">保存</button>
+        </div>
+        <div class="list">
+            <div class="input-group">
+                <label>标题颜色</label>
+                <input type="color" id="noteStyleTitleColor" value="#1D1D1F">
+            </div>
+            <div class="slider-group">
+                <label>
+                    <span>标题字体大小</span>
+                    <span id="noteStyleTitleSizeValue">16px</span>
+                </label>
+                <input type="range" min="12" max="24" value="16" id="noteStyleTitleSize">
+            </div>
+            <div class="toggle">
+                <span class="toggle-label">标题字体加粗</span>
+                <label class="switch">
+                    <input type="checkbox" id="noteStyleTitleWeight" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="input-group">
+                <label>阅读笔记背景</label>
+                <select id="noteStyleBgType">
+                    <option value="white">默认白色</option>
+                    <option value="black">默认黑色</option>
+                    <option value="macaron">马卡龙色系</option>
+                    <option value="color">自定义颜色</option>
+                    <option value="gradient">自定义渐变</option>
+                    <option value="image">自定义图片</option>
+                </select>
+            </div>
+            <div class="input-group" id="noteStyleBgColorGroup" style="display: none;">
+                <label>背景颜色</label>
+                <input type="color" id="noteStyleBgColor" value="#FFFFFF">
+            </div>
+            <div class="input-group">
+                <label>正文颜色</label>
+                <input type="color" id="noteStyleContentColor" value="#1D1D1F">
+            </div>
+            <div class="slider-group">
+                <label>
+                    <span>正文字体大小</span>
+                    <span id="noteStyleContentSizeValue">15px</span>
+                </label>
+                <input type="range" min="12" max="20" value="15" id="noteStyleContentSize">
+            </div>
+            <div class="toggle">
+                <span class="toggle-label">正文字体加粗</span>
+                <label class="switch">
+                    <input type="checkbox" id="noteStyleContentWeight">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        <input type="hidden" id="currentNoteId">
+    </div>
+    <!-- Read Note Page -->
+    <div id="page-read" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackRead">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div style="display: flex; gap: 0.5rem;">
+                <!-- 笔记内搜索按钮 -->
+                <button class="btn btn-icon" id="btnNoteSearch" style="display: none;">
+                    <svg><use href="#icon-search"></use></svg>
+                </button>
+                <button class="btn btn-secondary" id="btnEditNote">编辑</button>
+            </div>
+        </div>
+        <div id="noteSearchBox" class="search-box" style="display: none; margin-bottom: 0.5rem;">
+            <input type="text" id="noteSearchInput" placeholder="在笔记内搜索...">
+            <div id="noteSearchResults" style="display: none;"></div>
+        </div>
+        <h1 id="readTitle" style="font-size: var(--title-font-size, 16px); font-weight: var(--title-font-weight, 600); color: var(--title-color, #1D1D1F); margin-bottom: 1rem;"></h1>
+        <div id="readContent"></div>
+        <div id="pageNav" style="position: fixed; bottom: 3rem; left: 0; right: 0; display: none; justify-content: space-between; padding: 0 1rem; z-index: 100;">
+            <button class="btn btn-secondary" id="prevPage">上一页</button>
+            <span id="pageIndicator">1/1</span>
+            <button class="btn btn-secondary" id="nextPage">下一页</button>
+        </div>
+        <div id="readInfoBar" style="position: fixed; bottom: 0; left: 0; right: 0; padding: 0.5rem; background: var(--card-bg); display: none; justify-content: center; gap: 1rem; font-size: 0.8125rem; color: var(--secondary-text); z-index: 100;">
+            <span id="readTime">--:--</span>
+            <span id="readProgress">0%</span>
+        </div>
+    </div>
+    <!-- Password Input Page -->
+    <div id="page-password" class="page">
+        <div class="header">
+            <button class="btn btn-icon" id="btnBackPassword">
+                <svg><use href="#icon-back"></use></svg>
+            </button>
+            <div class="header-title">输入隐私密码</div>
+            <div></div>
+        </div>
+        <div class="password-inputs">
+            <input type="password" class="password-input" maxlength="1" id="p1">
+            <input type="password" class="password-input" maxlength="1" id="p2">
+            <input type="password" class="password-input" maxlength="1" id="p3">
+            <input type="password" class="password-input" maxlength="1" id="p4">
+        </div>
+    </div>
+    <!-- Virtual Back Button -->
+    <div class="virtual-back" id="virtualBackBtn">
+        <span>◀</span>
+        <span>返回</span>
+    </div>
+    <script>
+        // Data Store
+        let appData = {
+            notes: [],
+            privateNotes: [],
+            folders: [],
+            privatePassword: null,
+            settings: {
+                nightMode: false,
+                nightOpacity: 30,
+                nightWarmTone: false,
+                nightAntiBlue: false,
+                dpi: 100,
+                adaptiveScreen: true,
+                roundScreen: false,
+                themeColor: '#6200EE',
+                darkMode: false,
+                wearOsTheme: false,
+                frostedGlass: false,
+                wallpaper: null,
+                wallpaperBlur: 0,
+                wallpaperOpacity: 100,
+                wallpaperDisplay: 'cover',
+                dynamicWallpaper: false,
+                wallpaperAutoSwitch: 0,
+                borderRadius: 12,
+                clickEffect: 'none',
+                customEmoji: '⭐',
+                swipeBack: true,
+                virtualBack: false,
+                swipeBackArea: 50,
+                swipeBackHint: true,
+                titleColor: '#1D1D1F',
+                titleFontSize: 16,
+                titleFontWeight: true,
+                noteBgType: 'white',
+                noteBgColor: '#FFFFFF',
+                contentColor: '#1D1D1F',
+                contentFontSize: 15,
+                contentFontWeight: false,
+                noteLineHeight: 1.6,
+                noteMargin: 0,
+                minimalMode: false,
+                searchEnabled: false,
+                globalFontSize: 100,
+                globalFont: null,
+                fontFamily: 'system',
+                globalLineHeight: 1.6,
+                transitionAnimation: true,
+                transitionStyle: 'default',
+                privacyHintShown: false,
+                crownScrollSpeed: 1.0,
+                noteSearchEnabled: false,
+                searchShowContext: true,
+                readInfoEnabled: false,
+                readMode: 'scroll',
+                pageWordCount: 500,
+                titleOnlyFirstPage: false,
+                crownEnabled: true,
+                fabPosition: 'right',
+                // 新功能默认设置
+                cardBorder: false,
+                cardBorderWidth: 2,
+                noteDisplayMode: 'list',
+                readBgImage: null,
+                cardGap: 8,
+                gridCardWidth: 120,
+                gridCardHeight: 120,
+                previewContentLength: 10,
+                previewTitleLength: 10,
+                folderEnabled: false,
+                newUiEnabled: false,
+                careMode: false,
+                newIconMode: false,
+                currentTheme: 'default',
+                floatBallEnabled: false,
+                floatBallLongPress: 'more',
+                roundScreenUI: false,
+                showAppName: true,
+                showMinimalExit: true,
+                showNewFolderBtn: true,
+                customSchemes: {}
+            },
+            isPrivateMode: false,
+            pageHistory: [],
+            expandedFolder: null,
+            currentPageIndex: 0,
+            notePages: [],
+            wallpaperTimer: null,
+            longPressTimer: null
+        };
+        // Touch start position for swipe back
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let currentEditingNote = null;
+        let readTimeInterval = null;
+        let readScrollListener = null;
+        // 悬浮球拖动
+        let isDragging = false;
+        let dragStartX, dragStartY, ballStartX, ballStartY;
+
+        // 所有设置项，用于搜索
+        const allSettings = [
+            { name: '隐私空间', page: 'privacy' },
+            { name: '显示', page: 'display' },
+            { name: '主题 Beta', page: 'theme-beta' },
+            { name: '数据', page: 'data' },
+            { name: '个性化', page: 'personalization' },
+            { name: '手势', page: 'gesture' },
+            { name: '笔记', page: 'note-settings' },
+            { name: '实验室', page: 'lab' },
+            { name: '更多设置', page: 'more-settings' },
+            { name: '统计', page: 'stats' },
+            { name: '关于', page: 'about' },
+            { name: '夜间模式', page: 'display' },
+            { name: '暖色调', page: 'display' },
+            { name: '防蓝光', page: 'display' },
+            { name: '壁纸', page: 'personalization' },
+            { name: '字体', page: 'lab' },
+            { name: '悬浮球', page: 'gesture' },
+            { name: '关怀模式', page: 'lab' },
+            { name: '主题', page: 'theme-beta' }
+        ];
+
+        // Initialize
+        function init() {
+            loadData();
+            applySettings();
+            renderNotes();
+            bindEvents();
+            checkPrivacyHint();
+            initWallpaperTimer();
+        }
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('nextpen_data');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                appData = { ...appData, ...parsed };
+                // 兼容旧数据
+                if (!appData.settings.cardBorderWidth) appData.settings.cardBorderWidth = 2;
+                if (!appData.settings.cardGap) appData.settings.cardGap = 8;
+                if (!appData.settings.gridCardWidth) appData.settings.gridCardWidth = 120;
+                if (!appData.settings.gridCardHeight) appData.settings.gridCardHeight = 120;
+                if (!appData.settings.previewContentLength) appData.settings.previewContentLength = 10;
+                if (!appData.settings.previewTitleLength) appData.settings.previewTitleLength = 10;
+                if (!appData.settings.folderEnabled) appData.settings.folderEnabled = false;
+                if (!appData.settings.newUiEnabled) appData.settings.newUiEnabled = false;
+                if (!appData.settings.careMode) appData.settings.careMode = false;
+                if (!appData.settings.newIconMode) appData.settings.newIconMode = false;
+                if (!appData.settings.wallpaperOpacity) appData.settings.wallpaperOpacity = 100;
+                if (!appData.settings.noteLineHeight) appData.settings.noteLineHeight = 1.6;
+                if (!appData.settings.noteMargin) appData.settings.noteMargin = 0;
+                if (!appData.settings.fontFamily) appData.settings.fontFamily = 'system';
+                if (!appData.settings.globalLineHeight) appData.settings.globalLineHeight = 1.6;
+                if (!appData.settings.showAppName) appData.settings.showAppName = true;
+                if (!appData.settings.showMinimalExit) appData.settings.showMinimalExit = true;
+                if (!appData.settings.showNewFolderBtn) appData.settings.showNewFolderBtn = true;
+            }
+        }
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('nextpen_data', JSON.stringify(appData));
+        }
+        // 初始化壁纸定时切换
+        function initWallpaperTimer() {
+            if (appData.settings.wallpaperAutoSwitch > 0) {
+                if (appData.wallpaperTimer) clearInterval(appData.wallpaperTimer);
+                appData.wallpaperTimer = setInterval(() => {
+                    // 这里可以扩展为随机切换壁纸，暂时先提示
+                    showToast('壁纸已自动切换');
+                }, appData.settings.wallpaperAutoSwitch);
+            }
+        }
+        // Load stats data
+        function loadStats() {
+            const normalCount = appData.notes.length;
+            const privateCount = appData.privateNotes.length;
+            let totalWords = 0;
+            // 统计普通笔记
+            appData.notes.forEach(note => {
+                totalWords += (note.title || '').length;
+                totalWords += (note.content || '').length;
+            });
+            // 统计隐私笔记
+            appData.privateNotes.forEach(note => {
+                totalWords += (note.title || '').length;
+                totalWords += (note.content || '').length;
+            });
+            document.getElementById('statNormalNotes').textContent = normalCount;
+            document.getElementById('statPrivateNotes').textContent = privateCount;
+            document.getElementById('statTotalWords').textContent = totalWords;
+        }
+        // Apply settings to UI
+        function applySettings() {
+            const s = appData.settings;
+            
+            // 应用主题
+            document.body.classList.remove('theme-default', 'theme-monet', 'theme-minimal', 'theme-retro', 'theme-eye-care');
+            if (s.currentTheme) {
+                document.body.classList.add('theme-' + s.currentTheme);
+            }
+            
+            // 新UI莫奈色
+            if (s.newUiEnabled) {
+                document.body.classList.add('new-ui');
+            } else {
+                document.body.classList.remove('new-ui');
+            }
+            
+            // Apply CSS variables
+            document.documentElement.style.setProperty('--primary-color', s.themeColor);
+            document.documentElement.style.setProperty('--border-radius', s.borderRadius + 'px');
+            document.documentElement.style.setProperty('--card-gap', s.cardGap + 'px');
+            document.documentElement.style.setProperty('--grid-card-width', s.gridCardWidth + 'px');
+            document.documentElement.style.setProperty('--grid-card-height', s.gridCardHeight + 'px');
+            document.documentElement.style.setProperty('--card-border-width', s.cardBorderWidth + 'px');
+            document.documentElement.style.setProperty('--content-line-height', s.noteLineHeight);
+            document.documentElement.style.setProperty('--note-margin', s.noteMargin + 'px');
+            
+            // 字体设置
+            if (s.fontFamily !== 'system') {
+                document.body.style.fontFamily = s.fontFamily + ', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            } else {
+                document.body.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif';
+            }
+            document.body.style.lineHeight = s.globalLineHeight;
+            
+            // Dark mode
+            if (s.darkMode) {
+                document.body.classList.add('dark-mode');
+                // 深色模式自动调整文字颜色
+                if (s.titleColor === '#1D1D1F' || s.titleColor === '#000000') {
+                    s.titleColor = '#FFFFFF';
+                    document.getElementById('titleColor').value = s.titleColor;
+                }
+                if (s.contentColor === '#1D1D1F' || s.contentColor === '#000000') {
+                    s.contentColor = '#FFFFFF';
+                    document.getElementById('contentColor').value = s.contentColor;
+                }
+                // 更新CSS变量
+                document.documentElement.style.setProperty('--title-color', s.titleColor);
+                document.documentElement.style.setProperty('--content-color', s.contentColor);
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            // WearOS theme
+            if (s.wearOsTheme) {
+                document.body.classList.add('wearos-theme');
+            } else {
+                document.body.classList.remove('wearos-theme');
+            }
+            // Frosted glass
+            if (s.frostedGlass) {
+                document.body.classList.add('frosted-glass');
+            } else {
+                document.body.classList.remove('frosted-glass');
+            }
+            // Wallpaper
+            if (s.wallpaper) {
+                document.body.style.backgroundImage = `url(${s.wallpaper})`;
+                document.body.style.backdropFilter = `blur(${s.wallpaperBlur}px)`;
+                document.body.style.opacity = s.wallpaperOpacity / 100;
+                
+                // 壁纸显示方式
+                if (s.wallpaperDisplay === 'repeat') {
+                    document.body.style.backgroundRepeat = 'repeat';
+                    document.body.style.backgroundSize = 'auto';
+                } else if (s.wallpaperDisplay === 'center') {
+                    document.body.style.backgroundRepeat = 'no-repeat';
+                    document.body.style.backgroundSize = 'auto';
+                    document.body.style.backgroundPosition = 'center';
+                } else {
+                    document.body.style.backgroundRepeat = 'no-repeat';
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundPosition = 'center';
+                }
+            }
+            // Round screen
+            if (s.roundScreen) {
+                document.body.classList.add('round-screen');
+            } else {
+                document.body.classList.remove('round-screen');
+            }
+            // Round screen UI
+            if (s.roundScreenUI) {
+                document.body.classList.add('round-screen-ui');
+            } else {
+                document.body.classList.remove('round-screen-ui');
+            }
+            // Night mode mask
+            const mask = document.getElementById('nightMask');
+            if (s.nightMode) {
+                mask.style.opacity = s.nightOpacity / 100;
+                document.getElementById('nightOpacityGroup').style.display = 'block';
+                // 暖色调和防蓝光
+                document.body.classList.toggle('night-warm', s.nightWarmTone);
+                document.body.classList.toggle('night-anti-blue', s.nightAntiBlue);
+            } else {
+                mask.style.opacity = 0;
+                document.getElementById('nightOpacityGroup').style.display = 'none';
+                document.body.classList.remove('night-warm', 'night-anti-blue');
+            }
+            // DPI zoom
+            document.body.style.zoom = s.dpi / 100;
+            // Global font size (root html font size)
+            document.documentElement.style.fontSize = (16 * s.globalFontSize / 100) + 'px';
+            // Note style variables
+            document.documentElement.style.setProperty('--title-color', s.titleColor);
+            document.documentElement.style.setProperty('--title-font-size', s.titleFontSize + 'px');
+            document.documentElement.style.setProperty('--title-font-weight', s.titleFontWeight ? '600' : '400');
+            document.documentElement.style.setProperty('--content-color', s.contentColor);
+            document.documentElement.style.setProperty('--content-font-size', s.contentFontSize + 'px');
+            document.documentElement.style.setProperty('--content-font-weight', s.contentFontWeight ? '600' : '400');
+            // Minimal mode
+            const moreBtn = document.getElementById('btnMore');
+            const searchBox = document.getElementById('searchBox');
+            const appName = document.getElementById('appName');
+            const minimalExit = document.getElementById('minimalExit');
+            const btnNewFolder = document.getElementById('btnNewFolder');
+            
+            // 显示/隐藏元素
+            appName.style.display = s.showAppName ? 'block' : 'none';
+            minimalExit.style.display = s.showMinimalExit ? minimalExit.style.display : 'none';
+            btnNewFolder.style.display = s.showNewFolderBtn && s.folderEnabled ? 'flex' : 'none';
+            
+            if (s.minimalMode) {
+                if (s.showMinimalExit) {
+                    minimalExit.style.display = 'block';
+                }
+                moreBtn.style.display = 'none';
+                searchBox.style.display = 'none';
+            } else {
+                minimalExit.style.display = 'none';
+                moreBtn.style.display = 'flex';
+                if (s.searchEnabled) {
+                    searchBox.style.display = 'block';
+                }
+            }
+            // Search box
+            if (s.searchEnabled && !s.minimalMode) {
+                searchBox.style.display = 'block';
+            } else {
+                searchBox.style.display = 'none';
+            }
+            // Virtual back button
+            const virtualBackBtn = document.getElementById('virtualBackBtn');
+            if (s.virtualBack && s.swipeBackHint) {
+                virtualBackBtn.classList.add('show');
+            } else {
+                virtualBackBtn.classList.remove('show');
+            }
+            // Button position
+            const header = document.getElementById('homeHeader');
+            const fab = document.getElementById('btnNewNote');
+            if (s.fabPosition === 'left') {
+                header.style.justifyContent = 'flex-start';
+                fab.style.left = '1.25rem';
+                fab.style.right = 'auto';
+                fab.style.transform = 'none';
+            } else if (s.fabPosition === 'center') {
+                header.style.justifyContent = 'center';
+                fab.style.left = '50%';
+                fab.style.right = 'auto';
+                fab.style.transform = 'translateX(-50%)';
+            } else {
+                header.style.justifyContent = 'flex-end';
+                fab.style.right = '1.25rem';
+                fab.style.left = 'auto';
+                fab.style.transform = 'none';
+            }
+            // 卡片描边
+            if (s.cardBorder) {
+                document.body.classList.add('card-border-enabled');
+            } else {
+                document.body.classList.remove('card-border-enabled');
+            }
+            // 笔记显示模式
+            const noteList = document.getElementById('noteList');
+            if (s.noteDisplayMode === 'grid') {
+                noteList.classList.add('grid');
+                document.getElementById('gridCardWidthGroup').style.display = 'block';
+                document.getElementById('gridCardHeightGroup').style.display = 'none';
+            } else {
+                noteList.classList.remove('grid');
+                document.getElementById('gridCardWidthGroup').style.display = 'none';
+                document.getElementById('gridCardHeightGroup').style.display = 'none';
+            }
+            // 文件夹输入框显示
+            if (s.folderEnabled) {
+                document.getElementById('folderInputGroup').style.display = 'block';
+            } else {
+                document.getElementById('folderInputGroup').style.display = 'none';
+            }
+            // 文件夹按钮显示
+            if (s.folderEnabled && s.showNewFolderBtn) {
+                btnNewFolder.style.display = 'flex';
+            } else {
+                btnNewFolder.style.display = 'none';
+            }
+            // 关怀模式
+            if (s.careMode) {
+                document.body.classList.add('care-mode');
+                // 自动开启大字体和高对比度
+                document.body.style.zoom = 1.2;
+                document.body.style.filter = 'contrast(1.2)';
+            } else {
+                document.body.classList.remove('care-mode');
+                document.body.style.zoom = s.dpi / 100;
+                document.body.style.filter = '';
+            }
+            // 新图标文字优化
+            if (s.newIconMode) {
+                appName.style.letterSpacing = '0.2em';
+                appName.style.fontWeight = '500';
+            } else {
+                appName.style.letterSpacing = '0.1em';
+                appName.style.fontWeight = '300';
+            }
+            // 悬浮球
+            const floatBall = document.getElementById('floatBall');
+            if (s.floatBallEnabled) {
+                floatBall.style.display = 'flex';
+            } else {
+                floatBall.style.display = 'none';
+            }
+            // Sync form values
+            document.getElementById('nightOpacity').value = s.nightOpacity;
+            document.getElementById('nightOpacityValue').textContent = s.nightOpacity + '%';
+            document.getElementById('nightWarmTone').checked = s.nightWarmTone;
+            document.getElementById('nightAntiBlue').checked = s.nightAntiBlue;
+            document.getElementById('dpi').value = s.dpi;
+            document.getElementById('dpiValue').textContent = s.dpi + '%';
+            document.getElementById('cardGap').value = s.cardGap;
+            document.getElementById('cardGapValue').textContent = s.cardGap + 'px';
+            document.getElementById('adaptiveScreen').checked = s.adaptiveScreen;
+            document.getElementById('roundScreen').checked = s.roundScreen;
+            document.getElementById('themeColor').value = s.themeColor;
+            document.getElementById('borderRadius').value = s.borderRadius;
+            document.getElementById('radiusValue').textContent = s.borderRadius + 'px';
+            document.getElementById('wallpaperBlur').value = s.wallpaperBlur;
+            document.getElementById('wallpaperBlurValue').textContent = s.wallpaperBlur + 'px';
+            document.getElementById('wallpaperOpacity').value = s.wallpaperOpacity;
+            document.getElementById('wallpaperOpacityValue').textContent = s.wallpaperOpacity + '%';
+            document.getElementById('wallpaperDisplay').value = s.wallpaperDisplay;
+            document.getElementById('dynamicWallpaper').checked = s.dynamicWallpaper;
+            document.getElementById('wallpaperAutoSwitch').value = s.wallpaperAutoSwitch;
+            document.getElementById('clickEffect').value = s.clickEffect;
+            if (s.clickEffect === 'emoji') {
+                document.getElementById('emojiInputGroup').style.display = 'block';
+                document.getElementById('customEmoji').value = s.customEmoji;
+            }
+            document.getElementById('swipeBack').checked = s.swipeBack;
+            document.getElementById('swipeBackArea').value = s.swipeBackArea;
+            document.getElementById('swipeAreaValue').textContent = s.swipeBackArea + 'px';
+            document.getElementById('swipeBackHint').checked = s.swipeBackHint;
+            document.getElementById('titleColor').value = s.titleColor;
+            document.getElementById('titleFontSize').value = s.titleFontSize;
+            document.getElementById('titleSizeValue').textContent = s.titleFontSize + 'px';
+            document.getElementById('titleFontWeight').checked = s.titleFontWeight;
+            document.getElementById('noteBgType').value = s.noteBgType;
+            if (s.noteBgType === 'color') {
+                document.getElementById('noteBgColorGroup').style.display = 'block';
+                document.getElementById('noteBgColor').value = s.noteBgColor;
+            }
+            document.getElementById('contentColor').value = s.contentColor;
+            document.getElementById('contentFontSize').value = s.contentFontSize;
+            document.getElementById('contentSizeValue').textContent = s.contentFontSize + 'px';
+            document.getElementById('contentFontWeight').checked = s.contentFontWeight;
+            document.getElementById('noteLineHeight').value = s.noteLineHeight;
+            document.getElementById('noteLineHeightValue').textContent = s.noteLineHeight;
+            document.getElementById('noteMargin').value = s.noteMargin;
+            document.getElementById('noteMarginValue').textContent = s.noteMargin + 'px';
+            document.getElementById('globalFontSize').value = s.globalFontSize;
+            document.getElementById('globalFontSizeValue').textContent = s.globalFontSize + '%';
+            document.getElementById('fontFamily').value = s.fontFamily;
+            document.getElementById('fontSize').value = s.globalFontSize;
+            document.getElementById('fontSizeValue').textContent = s.globalFontSize + '%';
+            document.getElementById('globalLineHeight').value = s.globalLineHeight;
+            document.getElementById('globalLineHeightValue').textContent = s.globalLineHeight;
+            document.getElementById('transitionAnimation').checked = s.transitionAnimation;
+            document.getElementById('transitionStyle').value = s.transitionStyle;
+            // New settings sync
+            document.getElementById('crownScrollSpeed').value = s.crownScrollSpeed;
+            document.getElementById('crownSpeedValue').textContent = s.crownScrollSpeed + 'x';
+            document.getElementById('noteSearchEnabled').checked = s.noteSearchEnabled;
+            document.getElementById('searchShowContext').checked = s.searchShowContext;
+            document.getElementById('readInfoEnabled').checked = s.readInfoEnabled;
+            document.getElementById('readMode').value = s.readMode;
+            document.getElementById('pageWordCount').value = s.pageWordCount;
+            document.getElementById('fabPosition').value = s.fabPosition;
+            if (s.readMode === 'page') {
+                document.getElementById('pageWordCountGroup').style.display = 'block';
+            } else {
+                document.getElementById('pageWordCountGroup').style.display = 'none';
+            }
+            // 同步新设置
+            document.getElementById('titleOnlyFirstPage').checked = s.titleOnlyFirstPage;
+            document.getElementById('crownEnabled').checked = s.crownEnabled;
+            document.getElementById('cardBorder').checked = s.cardBorder;
+            document.getElementById('cardBorderWidth').value = s.cardBorderWidth;
+            document.getElementById('cardBorderWidthValue').textContent = s.cardBorderWidth + 'px';
+            document.getElementById('noteDisplayMode').value = s.noteDisplayMode;
+            document.getElementById('gridCardWidth').value = s.gridCardWidth;
+            document.getElementById('gridCardWidthValue').textContent = s.gridCardWidth + 'px';
+            document.getElementById('gridCardHeight').value = s.gridCardHeight;
+            document.getElementById('gridCardHeightValue').textContent = s.gridCardHeight + 'px';
+            document.getElementById('previewContentLength').value = s.previewContentLength;
+            document.getElementById('previewTitleLength').value = s.previewTitleLength;
+            document.getElementById('folderEnabled').checked = s.folderEnabled;
+            document.getElementById('newUiEnabled').checked = s.newUiEnabled;
+            document.getElementById('careMode').checked = s.careMode;
+            document.getElementById('newIconMode').checked = s.newIconMode;
+            document.getElementById('roundScreenUI').checked = s.roundScreenUI;
+            document.getElementById('floatBallEnabled').checked = s.floatBallEnabled;
+            document.getElementById('floatBallLongPress').value = s.floatBallLongPress;
+            document.getElementById('showAppName').checked = s.showAppName;
+            document.getElementById('showMinimalExit').checked = s.showMinimalExit;
+            document.getElementById('showNewFolderBtn').checked = s.showNewFolderBtn;
+            if (s.readBgImage) {
+                document.getElementById('readBgPreview').textContent = '已设置阅读背景图片';
+            }
+            // 主题预设选中状态
+            document.querySelectorAll('.theme-preset').forEach(el => {
+                el.classList.toggle('active', el.dataset.theme === s.currentTheme);
+            });
+        }
+        // Check privacy hint
+        function checkPrivacyHint() {
+            if (appData.privatePassword && !appData.settings.privacyHintShown) {
+                document.getElementById('privacyHint').style.display = 'block';
+            }
+        }
+        // Render notes list
+        function renderNotes(filter = '') {
+            const list = document.getElementById('noteList');
+            const notes = appData.isPrivateMode ? appData.privateNotes : appData.notes;
+            
+            list.innerHTML = '';
+            
+            // 渲染文件夹
+            if (appData.settings.folderEnabled) {
+                appData.folders.forEach(folder => {
+                    const folderNotes = notes.filter(n => folder.noteIds.includes(n.id));
+                    const item = document.createElement('div');
+                    item.className = 'folder-item';
+                    item.innerHTML = `
+                        <svg><use href="#icon-folder"></use></svg>
+                        <div class="list-item-content" onclick="toggleFolder('${folder.id}')">
+                            <div class="folder-item-title">${escapeHtml(folder.name)}</div>
+                            <div class="folder-item-count">${folderNotes.length} 条笔记</div>
+                        </div>
+                        <div class="note-item-actions">
+                            <div class="note-item-action" onclick="editFolder('${folder.id}')">
+                                <svg><use href="#icon-pencil"></use></svg>
+                            </div>
+                            <div class="note-item-action" onclick="deleteFolder('${folder.id}')">
+                                <svg><use href="#icon-trash"></use></svg>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                    
+                    // 如果文件夹展开，渲染里面的笔记
+                    if (appData.expandedFolder === folder.id) {
+                        folderNotes.forEach(note => {
+                            const noteEl = createNoteElement(note);
+                            noteEl.classList.add('folder-expanded');
+                            list.appendChild(noteEl);
+                        });
+                    }
+                });
+                
+                // 未分类的笔记
+                const ungroupedNotes = notes.filter(n => !appData.folders.some(f => f.noteIds.includes(n.id)));
+                ungroupedNotes.forEach(note => {
+                    list.appendChild(createNoteElement(note));
+                });
+            } else {
+                // 没有文件夹，直接渲染所有笔记
+                const filtered = filter ? notes.filter(note => 
+                    note.title.toLowerCase().includes(filter.toLowerCase()) || 
+                    note.content.toLowerCase().includes(filter.toLowerCase())
+                ) : notes;
+                filtered.forEach(note => {
+                    list.appendChild(createNoteElement(note));
+                });
+            }
+            
+            if (notes.length === 0) {
+                list.innerHTML = '<div style="text-align: center; padding: 2.5rem 0; color: var(--secondary-text);">暂无笔记，点击右下角添加</div>';
+                return;
+            }
+        }
+        
+        // 创建笔记元素
+        function createNoteElement(note) {
+            const s = appData.settings;
+            const item = document.createElement('div');
+            item.className = 'note-item';
+            // 处理预览文本，使用自定义字数
+            const previewContent = note.content ? 
+                (note.content.length > s.previewContentLength ? note.content.slice(0, s.previewContentLength) + '...' : note.content) 
+                : '无内容';
+            // 处理标题预览
+            const previewTitle = note.title ?
+                (note.title.length > s.previewTitleLength ? note.title.slice(0, s.previewTitleLength) + '...' : note.title)
+                : '无标题';
+            // 内联onclick，最可靠的绑定方式，确保所有浏览器都生效
+            item.innerHTML = `
+                <div class="note-item-content" onclick="openNote('${note.id}')">
+                    <div class="note-item-title">${escapeHtml(previewTitle)}</div>
+                    <div class="note-item-preview">${escapeHtml(previewContent)}</div>
+                </div>
+                <div class="note-item-actions">
+                    <div class="note-item-action" onclick="openNoteStyle('${note.id}')">
+                        <svg><use href="#icon-pencil"></use></svg>
+                    </div>
+                    <div class="note-item-action" onclick="deleteNote('${note.id}')">
+                        <svg><use href="#icon-trash"></use></svg>
+                    </div>
+                </div>
+            `;
+            return item;
+        }
+        
+        // 切换文件夹展开状态
+        function toggleFolder(folderId) {
+            if (appData.expandedFolder === folderId) {
+                appData.expandedFolder = null;
+            } else {
+                appData.expandedFolder = folderId;
+            }
+            renderNotes();
+        }
+        
+        // 编辑文件夹
+        function editFolder(folderId) {
+            event.stopPropagation();
+            const folder = appData.folders.find(f => f.id === folderId);
+            if (!folder) return;
+            const newName = prompt('请输入新的文件夹名称：', folder.name);
+            if (!newName) return;
+            folder.name = newName;
+            saveData();
+            renderNotes();
+            showToast('文件夹已更新');
+        }
+        
+        // 删除文件夹
+        function deleteFolder(folderId) {
+            event.stopPropagation();
+            if (!confirm('确定要删除这个文件夹吗？文件夹内的笔记会保留为未分类。')) return;
+            appData.folders = appData.folders.filter(f => f.id !== folderId);
+            saveData();
+            renderNotes();
+            showToast('文件夹已删除');
+        }
+        
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        // Page navigation
+        function goToPage(pageId) {
+            appData.pageHistory.push(currentPage());
+            const current = document.querySelector('.page.active');
+            current.classList.remove('active');
+            
+            const next = document.getElementById('page-' + pageId);
+            
+            // Apply transition animation
+            if (appData.settings.transitionAnimation) {
+                const animClass = 'anim-' + appData.settings.transitionStyle;
+                next.classList.add(animClass);
+                setTimeout(() => next.classList.remove(animClass), 300);
+            }
+            
+            next.classList.add('active');
+            
+            // 加载统计数据
+            if (pageId === 'stats') {
+                loadStats();
+            }
+        }
+        function goBack() {
+            if (appData.pageHistory.length === 0) {
+                return;
+            }
+            const prevPageId = appData.pageHistory.pop();
+            const current = document.querySelector('.page.active');
+            current.classList.remove('active');
+            
+            const prev = document.getElementById('page-' + prevPageId);
+            // Apply transition animation for back
+            if (appData.settings.transitionAnimation) {
+                const animClass = 'anim-' + appData.settings.transitionStyle;
+                prev.classList.add(animClass);
+                setTimeout(() => prev.classList.remove(animClass), 300);
+            }
+            
+            prev.classList.add('active');
+            
+            // 清空阅读页面的背景
+            const readPage = document.getElementById('page-read');
+            readPage.style.backgroundImage = '';
+            readPage.style.backgroundSize = '';
+            readPage.style.backgroundPosition = '';
+            readPage.style.backgroundRepeat = '';
+        }
+        function currentPage() {
+            const active = document.querySelector('.page.active');
+            return active.id.replace('page-', '');
+        }
+        // 翻页功能
+        function loadPage(index) {
+            if (index < 0 || index >= appData.notePages.length) return;
+            appData.currentPageIndex = index;
+            const contentEl = document.getElementById('readContent');
+            contentEl.textContent = appData.notePages[index];
+            document.getElementById('pageIndicator').textContent = `${index+1}/${appData.notePages.length}`;
+        }
+        function prevPage() {
+            loadPage(appData.currentPageIndex - 1);
+        }
+        function nextPage() {
+            loadPage(appData.currentPageIndex + 1);
+        }
+        // Open note for reading
+        function openNote(id) {
+            const notes = appData.isPrivateMode ? appData.privateNotes : appData.notes;
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            // Apply note custom style if exists
+            if (note.style) {
+                document.getElementById('readTitle').style.color = note.style.titleColor || appData.settings.titleColor;
+                document.getElementById('readTitle').style.fontSize = note.style.titleSize + 'px' || appData.settings.titleFontSize + 'px';
+                document.getElementById('readTitle').style.fontWeight = note.style.titleWeight ? '600' : '400';
+                document.getElementById('readContent').style.color = note.style.contentColor || appData.settings.contentColor;
+                document.getElementById('readContent').style.fontSize = note.style.contentSize + 'px' || appData.settings.contentFontSize + 'px';
+                document.getElementById('readContent').style.fontWeight = note.style.contentWeight ? '600' : '400';
+            } else {
+                document.getElementById('readTitle').style.color = appData.settings.titleColor;
+                document.getElementById('readTitle').style.fontSize = appData.settings.titleFontSize + 'px';
+                document.getElementById('readTitle').style.fontWeight = appData.settings.titleFontWeight ? '600' : '400';
+                document.getElementById('readContent').style.color = appData.settings.contentColor;
+                document.getElementById('readContent').style.fontSize = appData.settings.contentFontSize + 'px';
+                document.getElementById('readContent').style.fontWeight = appData.settings.contentFontWeight ? '600' : '400';
+            }
+            
+            document.getElementById('readTitle').textContent = note.title;
+            
+            // 显示笔记内搜索按钮
+            if (appData.settings.noteSearchEnabled) {
+                document.getElementById('btnNoteSearch').style.display = 'flex';
+            } else {
+                document.getElementById('btnNoteSearch').style.display = 'none';
+            }
+            
+            // 处理阅读模式
+            const contentEl = document.getElementById('readContent');
+            const pageNav = document.getElementById('pageNav');
+            if (appData.settings.readMode === 'page') {
+                // 分页模式
+                const fullContent = note.content;
+                const pageSize = appData.settings.pageWordCount;
+                appData.notePages = [];
+                for (let i = 0; i < fullContent.length; i += pageSize) {
+                    appData.notePages.push(fullContent.slice(i, i + pageSize));
+                }
+                // 标题仅第一页
+                if (appData.settings.titleOnlyFirstPage) {
+                    document.getElementById('readTitle').style.display = 'block';
+                }
+                // 加载第一页
+                loadPage(0);
+                // 显示翻页导航
+                pageNav.style.display = 'flex';
+                // 隐藏原来的按钮
+                document.getElementById('prevPage').style.display = 'none';
+                document.getElementById('nextPage').style.display = 'none';
+                // 关闭滚动
+                contentEl.style.overflowY = 'hidden';
+                // 添加点击翻页事件
+                const readPage = document.getElementById('page-read');
+                readPage.addEventListener('click', function(e) {
+                    if (appData.settings.readMode !== 'page') return;
+                    const rect = readPage.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const halfWidth = rect.width / 2;
+                    if (x < halfWidth) {
+                        prevPage();
+                    } else {
+                        nextPage();
+                    }
+                });
+            } else {
+                // 滑动模式
+                contentEl.textContent = note.content;
+                pageNav.style.display = 'none';
+                contentEl.style.overflowY = 'auto';
+            }
+            
+            // 应用阅读背景图片
+            if (appData.settings.readBgImage) {
+                const readPage = document.getElementById('page-read');
+                readPage.style.backgroundImage = `url(${appData.settings.readBgImage})`;
+                readPage.style.backgroundSize = 'cover';
+                readPage.style.backgroundPosition = 'center';
+                readPage.style.backgroundRepeat = 'no-repeat';
+            }
+            
+            goToPage('read');
+            
+            // Start read timer
+            if (readTimeInterval) clearInterval(readTimeInterval);
+            readTimeInterval = setInterval(() => {
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                document.getElementById('readTime').textContent = timeStr;
+            }, 1000);
+            
+            // Read progress
+            if (appData.settings.readMode === 'scroll') {
+                if (readScrollListener) contentEl.removeEventListener('scroll', readScrollListener);
+                readScrollListener = function() {
+                    const scrollTop = contentEl.scrollTop;
+                    const scrollHeight = contentEl.scrollHeight;
+                    const clientHeight = contentEl.clientHeight;
+                    const progress = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
+                    document.getElementById('readProgress').textContent = progress + '%';
+                };
+                contentEl.addEventListener('scroll', readScrollListener);
+            }
+            
+            // Read info bar
+            if (appData.settings.readInfoEnabled) {
+                document.getElementById('readInfoBar').style.display = 'flex';
+            } else {
+                document.getElementById('readInfoBar').style.display = 'none';
+            }
+        }
+        // Open note style
+        function openNoteStyle(id) {
+            event.stopPropagation();
+            const notes = appData.isPrivateMode ? appData.privateNotes : appData.notes;
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            
+            document.getElementById('currentNoteId').value = id;
+            
+            // Load style
+            if (note.style) {
+                document.getElementById('noteStyleTitleColor').value = note.style.titleColor || '#1D1D1F';
+                document.getElementById('noteStyleTitleSize').value = note.style.titleSize || 16;
+                document.getElementById('noteStyleTitleSizeValue').textContent = (note.style.titleSize || 16) + 'px';
+                document.getElementById('noteStyleTitleWeight').checked = note.style.titleWeight || false;
+                document.getElementById('noteStyleBgType').value = note.style.bgType || 'white';
+                if (note.style.bgType === 'color') {
+                    document.getElementById('noteStyleBgColorGroup').style.display = 'block';
+                    document.getElementById('noteStyleBgColor').value = note.style.bgColor || '#FFFFFF';
+                } else {
+                    document.getElementById('noteStyleBgColorGroup').style.display = 'none';
+                }
+                document.getElementById('noteStyleContentColor').value = note.style.contentColor || '#1D1D1F';
+                document.getElementById('noteStyleContentSize').value = note.style.contentSize || 15;
+                document.getElementById('noteStyleContentSizeValue').textContent = (note.style.contentSize || 15) + 'px';
+                document.getElementById('noteStyleContentWeight').checked = note.style.contentWeight || false;
+            } else {
+                // Reset to default
+                document.getElementById('noteStyleTitleColor').value = '#1D1D1F';
+                document.getElementById('noteStyleTitleSize').value = 16;
+                document.getElementById('noteStyleTitleSizeValue').textContent = '16px';
+                document.getElementById('noteStyleTitleWeight').checked = true;
+                document.getElementById('noteStyleBgType').value = 'white';
+                document.getElementById('noteStyleBgColorGroup').style.display = 'none';
+                document.getElementById('noteStyleContentColor').value = '#1D1D1F';
+                document.getElementById('noteStyleContentSize').value = 15;
+                document.getElementById('noteStyleContentSizeValue').textContent = '15px';
+                document.getElementById('noteStyleContentWeight').checked = false;
+            }
+            
+            goToPage('note-style');
+        }
+        // Delete note
+        function deleteNote(id) {
+            event.stopPropagation();
+            if (!confirm('确定要删除这条笔记吗？')) return;
+            
+            if (appData.isPrivateMode) {
+                appData.privateNotes = appData.privateNotes.filter(n => n.id !== id);
+            } else {
+                appData.notes = appData.notes.filter(n => n.id !== id);
+            }
+            // 从文件夹中移除
+            appData.folders.forEach(folder => {
+                folder.noteIds = folder.noteIds.filter(nid => nid !== id);
+            });
+            saveData();
+            renderNotes();
+            showToast('笔记已删除');
+        }
+        // Show toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        // Bind events
+        function bindEvents() {
+            // More button
+            document.getElementById('btnMore').addEventListener('click', () => {
+                goToPage('more');
+            });
+            
+            // Back buttons
+            document.getElementById('btnBackMore').addEventListener('click', goBack);
+            document.getElementById('btnBackPrivacy').addEventListener('click', goBack);
+            document.getElementById('btnBackDisplay').addEventListener('click', goBack);
+            document.getElementById('btnBackTheme').addEventListener('click', goBack);
+            document.getElementById('btnBackData').addEventListener('click', goBack);
+            document.getElementById('btnBackPersonal').addEventListener('click', goBack);
+            document.getElementById('btnBackGesture').addEventListener('click', goBack);
+            document.getElementById('btnBackNoteSettings').addEventListener('click', goBack);
+            document.getElementById('btnBackLab').addEventListener('click', goBack);
+            document.getElementById('btnBackMoreSettings').addEventListener('click', goBack);
+            document.getElementById('btnBackStats').addEventListener('click', goBack);
+            document.getElementById('btnBackAbout').addEventListener('click', goBack);
+            document.getElementById('btnBackEdit').addEventListener('click', goBack);
+            document.getElementById('btnBackNoteStyle').addEventListener('click', goBack);
+            document.getElementById('btnBackRead').addEventListener('click', goBack);
+            document.getElementById('btnBackPassword').addEventListener('click', goBack);
+            
+            // List item navigation
+            document.querySelectorAll('.list-item[data-page]').forEach(item => {
+                item.addEventListener('click', () => {
+                    goToPage(item.dataset.page);
+                });
+            });
+            
+            // New note button
+            document.getElementById('btnNewNote').addEventListener('click', () => {
+                document.getElementById('editTitle').value = '';
+                document.getElementById('editContent').value = '';
+                document.getElementById('editNoteId').value = '';
+                goToPage('edit');
+            });
+            
+            // 新建文件夹按钮
+            document.getElementById('btnNewFolder').addEventListener('click', function() {
+                const name = prompt('请输入文件夹名称：');
+                if (!name) return;
+                const folder = {
+                    id: 'folder_' + Date.now(),
+                    name: name,
+                    noteIds: []
+                };
+                appData.folders.push(folder);
+                saveData();
+                showToast('文件夹已创建');
+                renderNotes();
+            });
+            
+            // Save note
+            document.getElementById('btnSaveNote').addEventListener('click', saveNote);
+            
+            // Save note style
+            document.getElementById('btnSaveNoteStyle').addEventListener('click', saveNoteStyle);
+            
+            // 笔记内搜索按钮
+            document.getElementById('btnNoteSearch').addEventListener('click', function() {
+                const box = document.getElementById('noteSearchBox');
+                box.style.display = box.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            // 笔记内搜索输入
+            document.getElementById('noteSearchInput').addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                const resultsContainer = document.getElementById('noteSearchResults');
+                if (!query) {
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+                // 搜索匹配的位置
+                let fullContent;
+                if (appData.settings.readMode === 'page') {
+                    fullContent = appData.notePages.join('');
+                } else {
+                    fullContent = document.getElementById('readContent').textContent;
+                }
+                const matches = [];
+                let pos = fullContent.toLowerCase().indexOf(query.toLowerCase());
+                while (pos !== -1) {
+                    matches.push({
+                        pos: pos,
+                        context: fullContent.slice(Math.max(0, pos - 20), pos + query.length + 20)
+                    });
+                    pos = fullContent.toLowerCase().indexOf(query.toLowerCase(), pos + 1);
+                }
+                // 显示匹配列表
+                resultsContainer.innerHTML = '';
+                matches.forEach((match, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = `#${idx+1}: ...${escapeHtml(match.context)}...`;
+                    item.addEventListener('click', () => {
+                        if (appData.settings.readMode === 'page') {
+                            // 翻页模式，跳转到对应页
+                            const pageSize = appData.settings.pageWordCount;
+                            const pageIdx = Math.floor(match.pos / pageSize);
+                            loadPage(pageIdx);
+                        } else {
+                            // 滑动模式，滚动到对应位置
+                            const contentEl = document.getElementById('readContent');
+                            const charHeight = 20; // 大概的行高
+                            contentEl.scrollTop = match.pos * charHeight * 0.8;
+                        }
+                        resultsContainer.style.display = 'none';
+                    });
+                    resultsContainer.appendChild(item);
+                });
+                resultsContainer.style.display = matches.length > 0 ? 'block' : 'none';
+            });
+            
+            // 翻页按钮
+            document.getElementById('prevPage').addEventListener('click', prevPage);
+            document.getElementById('nextPage').addEventListener('click', nextPage);
+            
+            // Global search input - 全局搜索
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                const resultsContainer = document.getElementById('searchResults');
+                if (!query) {
+                    resultsContainer.style.display = 'none';
+                    renderNotes();
+                    return;
+                }
+                // 搜索匹配的笔记
+                const notes = appData.isPrivateMode ? appData.privateNotes : appData.notes;
+                const matches = notes.filter(note => 
+                    note.title.toLowerCase().includes(query.toLowerCase()) || 
+                    note.content.toLowerCase().includes(query.toLowerCase())
+                );
+                // 显示匹配列表
+                resultsContainer.innerHTML = '';
+                matches.forEach(note => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.innerHTML = `
+                        <div>${escapeHtml(note.title)}</div>
+                        <div style="font-size: 0.75rem; color: var(--secondary-text);">${escapeHtml(note.content.slice(0, 30))}...</div>
+                    `;
+                    item.addEventListener('click', () => {
+                        openNote(note.id);
+                        resultsContainer.style.display = 'none';
+                        document.getElementById('searchInput').value = '';
+                    });
+                    resultsContainer.appendChild(item);
+                });
+                resultsContainer.style.display = matches.length > 0 ? 'block' : 'none';
+            });
+
+            // 设置搜索
+            document.getElementById('settingsSearchInput').addEventListener('input', function(e) {
+                const query = e.target.value.trim().toLowerCase();
+                const resultsContainer = document.getElementById('settingsSearchResults');
+                if (!query) {
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+                const matches = allSettings.filter(s => s.name.toLowerCase().includes(query));
+                resultsContainer.innerHTML = '';
+                matches.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'search-result-item';
+                    el.textContent = item.name;
+                    el.addEventListener('click', () => {
+                        goToPage(item.page);
+                        resultsContainer.style.display = 'none';
+                        document.getElementById('settingsSearchInput').value = '';
+                    });
+                    resultsContainer.appendChild(el);
+                });
+                resultsContainer.style.display = matches.length > 0 ? 'block' : 'none';
+            });
+            
+            // 主题预设切换
+            document.querySelectorAll('.theme-preset').forEach(el => {
+                el.addEventListener('click', function() {
+                    const theme = this.dataset.theme;
+                    appData.settings.currentTheme = theme;
+                    saveData();
+                    applySettings();
+                    showToast('已切换到' + this.querySelector('.preset-name').textContent + '主题');
+                });
+            });
+
+            // 场景方案切换
+            document.querySelectorAll('.scheme-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    const scheme = this.dataset.scheme;
+                    // 应用预设方案
+                    if (scheme === 'work') {
+                        // 工作模式：默认主题，高效UI
+                        appData.settings.currentTheme = 'default';
+                        appData.settings.darkMode = false;
+                        appData.settings.nightMode = false;
+                    } else if (scheme === 'read') {
+                        // 阅读模式：护眼主题，大字体
+                        appData.settings.currentTheme = 'eye-care';
+                        appData.settings.contentFontSize = 18;
+                        appData.settings.noteLineHeight = 2.0;
+                    } else if (scheme === 'eye') {
+                        // 护眼模式：护眼主题，夜间模式
+                        appData.settings.currentTheme = 'eye-care';
+                        appData.settings.nightMode = true;
+                        appData.settings.nightAntiBlue = true;
+                    }
+                    saveData();
+                    applySettings();
+                    showToast('已切换到' + this.textContent);
+                });
+            });
+
+            // 保存方案
+            document.getElementById('btnSaveScheme').addEventListener('click', function() {
+                const name = prompt('请输入方案名称：');
+                if (!name) return;
+                appData.settings.customSchemes[name] = { ...appData.settings };
+                saveData();
+                showToast('方案已保存');
+            });
+
+            // 重置个性化
+            document.getElementById('btnResetPersonal').addEventListener('click', function() {
+                if (!confirm('确定要重置所有个性化配置吗？这将恢复默认设置。')) return;
+                // 重置个性化相关设置
+                const defaults = {
+                    themeColor: '#6200EE',
+                    darkMode: false,
+                    wearOsTheme: false,
+                    frostedGlass: false,
+                    wallpaper: null,
+                    wallpaperBlur: 0,
+                    wallpaperOpacity: 100,
+                    wallpaperDisplay: 'cover',
+                    dynamicWallpaper: false,
+                    wallpaperAutoSwitch: 0,
+                    borderRadius: 12,
+                    clickEffect: 'none',
+                    customEmoji: '⭐',
+                    noteDisplayMode: 'list',
+                    gridCardWidth: 120,
+                    gridCardHeight: 120,
+                    previewContentLength: 10,
+                    previewTitleLength: 10,
+                    currentTheme: 'default'
+                };
+                Object.assign(appData.settings, defaults);
+                saveData();
+                applySettings();
+                renderNotes();
+                showToast('个性化配置已重置');
+            });
+
+            // 卡片间距滑块
+            document.getElementById('cardGap').addEventListener('input', function(e) {
+                appData.settings.cardGap = parseInt(e.target.value);
+                document.getElementById('cardGapValue').textContent = e.target.value + 'px';
+                document.documentElement.style.setProperty('--card-gap', e.target.value + 'px');
+                saveData();
+                renderNotes();
+            });
+            
+            // 3x3卡片宽度
+            document.getElementById('gridCardWidth').addEventListener('input', function(e) {
+                appData.settings.gridCardWidth = parseInt(e.target.value);
+                document.getElementById('gridCardWidthValue').textContent = e.target.value + 'px';
+                document.documentElement.style.setProperty('--grid-card-width', e.target.value + 'px');
+                saveData();
+                renderNotes();
+            });
+            
+            // 3x3卡片高度
+            document.getElementById('gridCardHeight').addEventListener('input', function(e) {
+                appData.settings.gridCardHeight = parseInt(e.target.value);
+                document.getElementById('gridCardHeightValue').textContent = e.target.value + 'px';
+                document.documentElement.style.setProperty('--grid-card-height', e.target.value + 'px');
+                saveData();
+                renderNotes();
+            });
+            
+            // 预览字数
+            document.getElementById('previewContentLength').addEventListener('change', function(e) {
+                appData.settings.previewContentLength = parseInt(e.target.value) || 10;
+                saveData();
+                renderNotes();
+            });
+            document.getElementById('previewTitleLength').addEventListener('change', function(e) {
+                appData.settings.previewTitleLength = parseInt(e.target.value) || 10;
+                saveData();
+                renderNotes();
+            });
+            
+            // 卡片描边粗细
+            document.getElementById('cardBorderWidth').addEventListener('input', function(e) {
+                appData.settings.cardBorderWidth = parseInt(e.target.value);
+                document.getElementById('cardBorderWidthValue').textContent = e.target.value + 'px';
+                document.documentElement.style.setProperty('--card-border-width', e.target.value + 'px');
+                saveData();
+            });
+            
+            // 文件夹开关
+            document.getElementById('folderEnabled').addEventListener('change', function(e) {
+                appData.settings.folderEnabled = e.target.checked;
+                saveData();
+                applySettings();
+                renderNotes();
+            });
+            
+            // 添加文件夹
+            document.getElementById('btnAddFolder').addEventListener('click', function() {
+                const name = document.getElementById('newFolderName').value.trim();
+                if (!name) {
+                    showToast('请输入文件夹名称');
+                    return;
+                }
+                const folder = {
+                    id: 'folder_' + Date.now(),
+                    name: name,
+                    noteIds: []
+                };
+                appData.folders.push(folder);
+                saveData();
+                document.getElementById('newFolderName').value = '';
+                showToast('文件夹已创建');
+                renderNotes();
+            });
+            
+            // 新UI开关
+            document.getElementById('newUiEnabled').addEventListener('change', function(e) {
+                appData.settings.newUiEnabled = e.target.checked;
+                saveData();
+                applySettings();
+                renderNotes();
+            });
+
+            // 圆形屏幕UI开关
+            document.getElementById('roundScreenUI').addEventListener('change', function(e) {
+                appData.settings.roundScreenUI = e.target.checked;
+                saveData();
+                applySettings();
+            });
+
+            // 字体选择
+            document.getElementById('fontFamily').addEventListener('change', function(e) {
+                appData.settings.fontFamily = e.target.value;
+                saveData();
+                applySettings();
+                showToast('字体已更新');
+            });
+
+            // 字体大小
+            document.getElementById('fontSize').addEventListener('input', function(e) {
+                appData.settings.globalFontSize = parseInt(e.target.value);
+                document.getElementById('fontSizeValue').textContent = e.target.value + '%';
+                saveData();
+                applySettings();
+            });
+
+            // 全局行高
+            document.getElementById('globalLineHeight').addEventListener('input', function(e) {
+                appData.settings.globalLineHeight = parseFloat(e.target.value);
+                document.getElementById('globalLineHeightValue').textContent = e.target.value;
+                saveData();
+                applySettings();
+            });
+
+            // 笔记行高
+            document.getElementById('noteLineHeight').addEventListener('input', function(e) {
+                appData.settings.noteLineHeight = parseFloat(e.target.value);
+                document.getElementById('noteLineHeightValue').textContent = e.target.value;
+                document.documentElement.style.setProperty('--content-line-height', e.target.value);
+                saveData();
+            });
+
+            // 笔记页边距
+            document.getElementById('noteMargin').addEventListener('input', function(e) {
+                appData.settings.noteMargin = parseInt(e.target.value);
+                document.getElementById('noteMarginValue').textContent = e.target.value + 'px';
+                document.documentElement.style.setProperty('--note-margin', e.target.value + 'px');
+                saveData();
+            });
+
+            // 夜间暖色调
+            document.getElementById('nightWarmTone').addEventListener('change', function(e) {
+                appData.settings.nightWarmTone = e.target.checked;
+                saveData();
+                applySettings();
+            });
+
+            // 夜间防蓝光
+            document.getElementById('nightAntiBlue').addEventListener('change', function(e) {
+                appData.settings.nightAntiBlue = e.target.checked;
+                saveData();
+                applySettings();
+            });
+
+            // 壁纸透明度
+            document.getElementById('wallpaperOpacity').addEventListener('input', function(e) {
+                appData.settings.wallpaperOpacity = parseInt(e.target.value);
+                document.getElementById('wallpaperOpacityValue').textContent = e.target.value + '%';
+                if (appData.settings.wallpaper) {
+                    document.body.style.opacity = e.target.value / 100;
+                }
+                saveData();
+            });
+
+            // 壁纸显示方式
+            document.getElementById('wallpaperDisplay').addEventListener('change', function(e) {
+                appData.settings.wallpaperDisplay = e.target.value;
+                saveData();
+                applySettings();
+            });
+
+            // 动态壁纸
+            document.getElementById('dynamicWallpaper').addEventListener('change', function(e) {
+                appData.settings.dynamicWallpaper = e.target.checked;
+                saveData();
+                showToast(e.target.checked ? '已启用动态壁纸支持' : '已关闭动态壁纸支持');
+            });
+
+            // 定时切换壁纸
+            document.getElementById('wallpaperAutoSwitch').addEventListener('change', function(e) {
+                appData.settings.wallpaperAutoSwitch = parseInt(e.target.value);
+                saveData();
+                initWallpaperTimer();
+                showToast('定时切换壁纸已更新');
+            });
+
+            // 悬浮球开关
+            document.getElementById('floatBallEnabled').addEventListener('change', function(e) {
+                appData.settings.floatBallEnabled = e.target.checked;
+                saveData();
+                applySettings();
+            });
+
+            // 悬浮球长按动作
+            document.getElementById('floatBallLongPress').addEventListener('change', function(e) {
+                appData.settings.floatBallLongPress = e.target.value;
+                saveData();
+            });
+
+            // 显示/隐藏设置
+            document.getElementById('showAppName').addEventListener('change', function(e) {
+                appData.settings.showAppName = e.target.checked;
+                saveData();
+                applySettings();
+            });
+            document.getElementById('showMinimalExit').addEventListener('change', function(e) {
+                appData.settings.showMinimalExit = e.target.checked;
+                saveData();
+                applySettings();
+            });
+            document.getElementById('showNewFolderBtn').addEventListener('change', function(e) {
+                appData.settings.showNewFolderBtn = e.target.checked;
+                saveData();
+                applySettings();
+            });
+
+            // 关怀模式
+            document.getElementById('careMode').addEventListener('change', function(e) {
+                appData.settings.careMode = e.target.checked;
+                saveData();
+                applySettings();
+                showToast(e.target.checked ? '已开启关怀模式，已自动调整为大字体高对比度' : '已关闭关怀模式');
+            });
+            
+            // 表冠滚动速度
+            document.getElementById('crownScrollSpeed').addEventListener('input', function(e) {
+                appData.settings.crownScrollSpeed = parseFloat(e.target.value);
+                document.getElementById('crownSpeedValue').textContent = e.target.value + 'x';
+                saveData();
+            });
+            
+            // 笔记显示模式切换
+            document.getElementById('noteDisplayMode').addEventListener('change', function(e) {
+                appData.settings.noteDisplayMode = e.target.value;
+                saveData();
+                applySettings();
+                renderNotes();
+            });
+            
+            // 阅读模式切换
+            document.getElementById('readMode').addEventListener('change', function(e) {
+                appData.settings.readMode = e.target.value;
+                saveData();
+                applySettings();
+            });
+            
+            // 其他滑块事件
+            document.getElementById('nightOpacity').addEventListener('input', function(e) {
+                appData.settings.nightOpacity = parseInt(e.target.value);
+                document.getElementById('nightOpacityValue').textContent = e.target.value + '%';
+                document.getElementById('nightMask').style.opacity = e.target.value / 100;
+                saveData();
+            });
+            document.getElementById('dpi').addEventListener('input', function(e) {
+                appData.settings.dpi = parseInt(e.target.value);
+                document.getElementById('dpiValue').textContent = e.target.value + '%';
+                if (!appData.settings.careMode) {
+                    document.body.style.zoom = e.target.value / 100;
+                }
+                saveData();
+            });
+            document.getElementById('borderRadius').addEventListener('input', function(e) {
+                appData.settings.borderRadius = parseInt(e.target.value);
+                document.getElementById('radiusValue').textContent = e.target.value + 'px';
+                document.documentElement.style.setProperty('--border-radius', e.target.value + 'px');
+                saveData();
+            });
+            document.getElementById('wallpaperBlur').addEventListener('input', function(e) {
+                appData.settings.wallpaperBlur = parseInt(e.target.value);
+                document.getElementById('wallpaperBlurValue').textContent = e.target.value + 'px';
+                if (appData.settings.wallpaper) {
+                    document.body.style.backdropFilter = `blur(${e.target.value}px)`;
+                }
+                saveData();
+            });
+            document.getElementById('swipeBackArea').addEventListener('input', function(e) {
+                appData.settings.swipeBackArea = parseInt(e.target.value);
+                document.getElementById('swipeAreaValue').textContent = e.target.value + 'px';
+                saveData();
+            });
+
+            // 悬浮球事件
+            const floatBall = document.getElementById('floatBall');
+            floatBall.addEventListener('touchstart', function(e) {
+                isDragging = false;
+                const touch = e.touches[0];
+                dragStartX = touch.clientX;
+                dragStartY = touch.clientY;
+                const rect = this.getBoundingClientRect();
+                ballStartX = rect.left;
+                ballStartY = rect.top;
+                
+                // 长按检测
+                appData.longPressTimer = setTimeout(() => {
+                    // 执行长按动作
+                    const action = appData.settings.floatBallLongPress;
+                    if (action === 'more') {
+                        goToPage('more');
+                    } else if (action === 'new') {
+                        document.getElementById('editTitle').value = '';
+                        document.getElementById('editContent').value = '';
+                        document.getElementById('editNoteId').value = '';
+                        goToPage('edit');
+                    } else if (action === 'search') {
+                        if (appData.settings.searchEnabled) {
+                            document.getElementById('searchInput').focus();
+                        }
+                    }
+                }, 500);
+            });
+
+            floatBall.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const dx = touch.clientX - dragStartX;
+                const dy = touch.clientY - dragStartY;
+                
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    isDragging = true;
+                    clearTimeout(appData.longPressTimer);
+                }
+                
+                if (isDragging) {
+                    let newX = ballStartX + dx;
+                    let newY = ballStartY + dy;
+                    // 边界检测
+                    newX = Math.max(0, Math.min(window.innerWidth - this.offsetWidth, newX));
+                    newY = Math.max(0, Math.min(window.innerHeight - this.offsetHeight, newY));
+                    
+                    this.style.left = newX + 'px';
+                    this.style.top = newY + 'px';
+                    this.style.right = 'auto';
+                    this.style.bottom = 'auto';
+                }
+            });
+
+            floatBall.addEventListener('touchend', function(e) {
+                clearTimeout(appData.longPressTimer);
+                if (!isDragging) {
+                    // 点击返回
+                    goBack();
+                }
+            });
+
+            // 壁纸上传
+            document.getElementById('wallpaperInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        appData.settings.wallpaper = e.target.result;
+                        saveData();
+                        applySettings();
+                        showToast('壁纸已设置');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            document.getElementById('btnWallpaperInput').addEventListener('click', function() {
+                document.getElementById('wallpaperInput').click();
+            });
+
+            // 阅读背景上传
+            document.getElementById('readBgInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        appData.settings.readBgImage = e.target.result;
+                        saveData();
+                        document.getElementById('readBgPreview').textContent = '已设置阅读背景图片';
+                        showToast('阅读背景已设置');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            document.getElementById('btnReadBgInput').addEventListener('click', function() {
+                document.getElementById('readBgInput').click();
+            });
+
+            // 字体文件上传
+            document.getElementById('globalFontInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // 创建字体
+                        const font = new FontFace('CustomFont', e.target.result);
+                        font.load().then(function(loadedFont) {
+                            document.fonts.add(loadedFont);
+                            appData.settings.globalFont = e.target.result;
+                            appData.settings.fontFamily = 'CustomFont';
+                            saveData();
+                            applySettings();
+                            showToast('自定义字体已加载');
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+            document.getElementById('btnFontInput').addEventListener('click', function() {
+                document.getElementById('globalFontInput').click();
+            });
+            
+            // Touch swipe back
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchend', function(e) {
+                if (!appData.settings.swipeBack) return;
+                
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                const dx = touchEndX - touchStartX;
+                const dy = touchEndY - touchStartY;
+                
+                // 只检测左侧边缘的滑动
+                if (touchStartX < appData.settings.swipeBackArea && dx > 50 && Math.abs(dy) < 50) {
+                    goBack();
+                }
+            });
+        }
+        // Save note
+        function saveNote() {
+            const title = document.getElementById('editTitle').value.trim();
+            const content = document.getElementById('editContent').value.trim();
+            const id = document.getElementById('editNoteId').value;
+            
+            if (!title && !content) {
+                showToast('笔记内容不能为空');
+                return;
+            }
+            
+            if (id) {
+                // Update existing note
+                const notes = appData.isPrivateMode ? appData.privateNotes : appData.notes;
+                const note = notes.find(n => n.id === id);
+                if (note) {
+                    note.title = title;
+                    note.content = content;
+                    note.updatedAt = Date.now();
+                }
+            } else {
+                // Create new note
+                const note = {
+                    id: 'note_' + Date.now(),
+                    title: title,
+                    content: content,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                
+                if (appData.isPrivateMode) {
+                    appData.privateNotes.push(note);
+                } else {
+                    appData.notes.push(note);
+                }
+            }
+            
+            saveData();
+            renderNotes();
+            goBack();
+            showToast('笔记已保存');
+        }
+        // Save note style
+        function saveNoteStyle() {
+            const noteId = document.getElementById('currentNoteId').value;
+            const notes = appData.isPrivateMode ? appData.privateNotes : appData.notes;
+            const note = notes.find(n => n.id === noteId);
+            
+            if (note) {
+                note.style = {
+                    titleColor: document.getElementById('noteStyleTitleColor').value,
+                    titleSize: parseInt(document.getElementById('noteStyleTitleSize').value),
+                    titleWeight: document.getElementById('noteStyleTitleWeight').checked,
+                    bgType: document.getElementById('noteStyleBgType').value,
+                    bgColor: document.getElementById('noteStyleBgColor').value,
+                    contentColor: document.getElementById('noteStyleContentColor').value,
+                    contentSize: parseInt(document.getElementById('noteStyleContentSize').value),
+                    contentWeight: document.getElementById('noteStyleContentWeight').checked
+                };
+                saveData();
+                goBack();
+                showToast('笔记样式已保存');
+            }
+        }
+        // Password input handling
+        document.querySelectorAll('.password-input').forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value && index < 3) {
+                    document.querySelectorAll('.password-input')[index + 1].focus();
+                }
+            });
+        });
+        // Set password
+        document.getElementById('btnSetPassword').addEventListener('click', function() {
+            const pwd = document.getElementById('privacyPassword').value;
+            if (pwd.length !== 4) {
+                showToast('请输入4位密码');
+                return;
+            }
+            appData.privatePassword = pwd;
+            appData.settings.privacyHintShown = true;
+            saveData();
+            showToast('密码已设置');
+        });
+        // Reset password
+        document.getElementById('btnResetPassword').addEventListener('click', function() {
+            if (!confirm('确定要重置密码吗？')) return;
+            appData.privatePassword = null;
+            saveData();
+            showToast('密码已重置');
+        });
+        // Forgot password
+        document.getElementById('btnForgotPassword').addEventListener('click', function() {
+            if (!confirm('确定要清空隐私数据吗？这将删除所有私密笔记。')) return;
+            appData.privatePassword = null;
+            appData.privateNotes = [];
+            saveData();
+            showToast('隐私数据已清空');
+        });
+        // App name click to enter private mode
+        document.getElementById('appName').addEventListener('click', function() {
+            if (appData.privatePassword && !appData.isPrivateMode) {
+                goToPage('password');
+            }
+        });
+        // Password submit
+        document.querySelectorAll('.password-input').forEach(input => {
+            input.addEventListener('input', function() {
+                setTimeout(() => {
+                    const p1 = document.getElementById('p1').value;
+                    const p2 = document.getElementById('p2').value;
+                    const p3 = document.getElementById('p3').value;
+                    const p4 = document.getElementById('p4').value;
+                    const pwd = p1 + p2 + p3 + p4;
+                    
+                    if (pwd.length === 4) {
+                        if (pwd === appData.privatePassword) {
+                            appData.isPrivateMode = true;
+                            goBack();
+                            renderNotes();
+                            showToast('已进入隐私空间');
+                        } else {
+                            showToast('密码错误');
+                            // Clear inputs
+                            document.querySelectorAll('.password-input').forEach(i => i.value = '');
+                            document.getElementById('p1').focus();
+                        }
+                    }
+                }, 0);
+            });
+        });
+        // Minimal exit click
+        document.getElementById('minimalExit').addEventListener('click', function() {
+            appData.settings.minimalMode = false;
+            saveData();
+            applySettings();
+            showToast('已退出极简模式');
+        });
+        // Minimal mode toggle
+        document.getElementById('minimalMode').addEventListener('change', function(e) {
+            appData.settings.minimalMode = e.target.checked;
+            saveData();
+            applySettings();
+            if (e.target.checked) {
+                showToast('已开启极简模式');
+            }
+        });
+        // Search enabled toggle
+        document.getElementById('searchEnabled').addEventListener('change', function(e) {
+            appData.settings.searchEnabled = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Global font size
+        document.getElementById('globalFontSize').addEventListener('input', function(e) {
+            appData.settings.globalFontSize = parseInt(e.target.value);
+            document.getElementById('globalFontSizeValue').textContent = e.target.value + '%';
+            saveData();
+            applySettings();
+        });
+        // Transition animation
+        document.getElementById('transitionAnimation').addEventListener('change', function(e) {
+            appData.settings.transitionAnimation = e.target.checked;
+            saveData();
+        });
+        // Transition style
+        document.getElementById('transitionStyle').addEventListener('change', function(e) {
+            appData.settings.transitionStyle = e.target.value;
+            saveData();
+        });
+        // Crown enabled
+        document.getElementById('crownEnabled').addEventListener('change', function(e) {
+            appData.settings.crownEnabled = e.target.checked;
+            saveData();
+        });
+        // Copy data
+        document.getElementById('btnCopyData').addEventListener('click', function() {
+            const data = JSON.stringify(appData);
+            navigator.clipboard.writeText(data).then(() => {
+                showToast('数据已复制到剪贴板');
+            });
+        });
+        // Import data
+        document.getElementById('btnImportData').addEventListener('click', function() {
+            const data = document.getElementById('importData').value;
+            try {
+                const parsed = JSON.parse(data);
+                appData = parsed;
+                saveData();
+                location.reload();
+            } catch (e) {
+                showToast('数据格式错误');
+            }
+        });
+        // Clear data
+        document.getElementById('btnClearData').addEventListener('click', function() {
+            if (!confirm('确定要清空所有数据吗？这将删除所有笔记和设置。')) return;
+            localStorage.removeItem('nextpen_data');
+            location.reload();
+        });
+        // Click effect
+        document.getElementById('clickEffect').addEventListener('change', function(e) {
+            appData.settings.clickEffect = e.target.value;
+            if (e.target.value === 'emoji') {
+                document.getElementById('emojiInputGroup').style.display = 'block';
+            } else {
+                document.getElementById('emojiInputGroup').style.display = 'none';
+            }
+            saveData();
+        });
+        document.getElementById('customEmoji').addEventListener('change', function(e) {
+            appData.settings.customEmoji = e.target.value;
+            saveData();
+        });
+        // Note bg type
+        document.getElementById('noteBgType').addEventListener('change', function(e) {
+            appData.settings.noteBgType = e.target.value;
+            if (e.target.value === 'color') {
+                document.getElementById('noteBgColorGroup').style.display = 'block';
+            } else {
+                document.getElementById('noteBgColorGroup').style.display = 'none';
+            }
+            saveData();
+        });
+        document.getElementById('noteBgColor').addEventListener('change', function(e) {
+            appData.settings.noteBgColor = e.target.value;
+            saveData();
+        });
+        // Title color
+        document.getElementById('titleColor').addEventListener('change', function(e) {
+            appData.settings.titleColor = e.target.value;
+            document.documentElement.style.setProperty('--title-color', e.target.value);
+            saveData();
+        });
+        // Title font size
+        document.getElementById('titleFontSize').addEventListener('input', function(e) {
+            appData.settings.titleFontSize = parseInt(e.target.value);
+            document.getElementById('titleSizeValue').textContent = e.target.value + 'px';
+            document.documentElement.style.setProperty('--title-font-size', e.target.value + 'px');
+            saveData();
+        });
+        // Title font weight
+        document.getElementById('titleFontWeight').addEventListener('change', function(e) {
+            appData.settings.titleFontWeight = e.target.checked;
+            document.documentElement.style.setProperty('--title-font-weight', e.target.checked ? '600' : '400');
+            saveData();
+        });
+        // Content color
+        document.getElementById('contentColor').addEventListener('change', function(e) {
+            appData.settings.contentColor = e.target.value;
+            document.documentElement.style.setProperty('--content-color', e.target.value);
+            saveData();
+        });
+        // Content font size
+        document.getElementById('contentFontSize').addEventListener('input', function(e) {
+            appData.settings.contentFontSize = parseInt(e.target.value);
+            document.getElementById('contentSizeValue').textContent = e.target.value + 'px';
+            document.documentElement.style.setProperty('--content-font-size', e.target.value + 'px');
+            saveData();
+        });
+        // Content font weight
+        document.getElementById('contentFontWeight').addEventListener('change', function(e) {
+            appData.settings.contentFontWeight = e.target.checked;
+            document.documentElement.style.setProperty('--content-font-weight', e.target.checked ? '600' : '400');
+            saveData();
+        });
+        // Theme color
+        document.getElementById('themeColor').addEventListener('change', function(e) {
+            appData.settings.themeColor = e.target.value;
+            document.documentElement.style.setProperty('--primary-color', e.target.value);
+            saveData();
+        });
+        // Dark mode
+        document.getElementById('darkMode').addEventListener('change', function(e) {
+            appData.settings.darkMode = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // WearOS theme
+        document.getElementById('wearOsTheme').addEventListener('change', function(e) {
+            appData.settings.wearOsTheme = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Frosted glass
+        document.getElementById('frostedGlass').addEventListener('change', function(e) {
+            appData.settings.frostedGlass = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Night mode
+        document.getElementById('nightMode').addEventListener('change', function(e) {
+            appData.settings.nightMode = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Swipe back
+        document.getElementById('swipeBack').addEventListener('change', function(e) {
+            appData.settings.swipeBack = e.target.checked;
+            saveData();
+        });
+        // Virtual back
+        document.getElementById('virtualBack').addEventListener('change', function(e) {
+            appData.settings.virtualBack = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Swipe back hint
+        document.getElementById('swipeBackHint').addEventListener('change', function(e) {
+            appData.settings.swipeBackHint = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Round screen
+        document.getElementById('roundScreen').addEventListener('change', function(e) {
+            appData.settings.roundScreen = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Adaptive screen
+        document.getElementById('adaptiveScreen').addEventListener('change', function(e) {
+            appData.settings.adaptiveScreen = e.target.checked;
+            saveData();
+        });
+        // Fab position
+        document.getElementById('fabPosition').addEventListener('change', function(e) {
+            appData.settings.fabPosition = e.target.value;
+            saveData();
+            applySettings();
+        });
+        // Card border
+        document.getElementById('cardBorder').addEventListener('change', function(e) {
+            appData.settings.cardBorder = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // New icon mode
+        document.getElementById('newIconMode').addEventListener('change', function(e) {
+            appData.settings.newIconMode = e.target.checked;
+            saveData();
+            applySettings();
+        });
+        // Note search enabled
+        document.getElementById('noteSearchEnabled').addEventListener('change', function(e) {
+            appData.settings.noteSearchEnabled = e.target.checked;
+            saveData();
+        });
+        // Search show context
+        document.getElementById('searchShowContext').addEventListener('change', function(e) {
+            appData.settings.searchShowContext = e.target.checked;
+            saveData();
+        });
+        // Read info enabled
+        document.getElementById('readInfoEnabled').addEventListener('change', function(e) {
+            appData.settings.readInfoEnabled = e.target.checked;
+            saveData();
+        });
+        // Title only first page
+        document.getElementById('titleOnlyFirstPage').addEventListener('change', function(e) {
+            appData.settings.titleOnlyFirstPage = e.target.checked;
+            saveData();
+        });
+        // Crown scroll speed
+        document.getElementById('crownScrollSpeed').addEventListener('input', function(e) {
+            appData.settings.crownScrollSpeed = parseFloat(e.target.value);
+            document.getElementById('crownSpeedValue').textContent = e.target.value + 'x';
+            saveData();
+        });
+        // Page word count
+        document.getElementById('pageWordCount').addEventListener('change', function(e) {
+            appData.settings.pageWordCount = parseInt(e.target.value);
+            saveData();
+        });
+        // Virtual back click
+        document.getElementById('virtualBackBtn').addEventListener('click', goBack);
+        // Click effect handling
+        document.addEventListener('click', function(e) {
+            if (appData.settings.clickEffect === 'none') return;
+            
+            const effect = document.createElement('div');
+            if (appData.settings.clickEffect === 'ripple') {
+                effect.className = 'click-effect-ripple';
+                const rect = e.target.getBoundingClientRect();
+                effect.style.left = (e.clientX - rect.left) + 'px';
+                effect.style.top = (e.clientY - rect.top) + 'px';
+                effect.style.width = '20px';
+                effect.style.height = '20px';
+                e.target.appendChild(effect);
+            } else if (appData.settings.clickEffect === 'star') {
+                effect.className = 'click-effect-star';
+                effect.textContent = '⭐';
+                effect.style.left = e.clientX + 'px';
+                effect.style.top = e.clientY + 'px';
+                document.body.appendChild(effect);
+            } else if (appData.settings.clickEffect === 'emoji') {
+                effect.className = 'click-effect-star';
+                effect.textContent = appData.settings.customEmoji;
+                effect.style.left = e.clientX + 'px';
+                effect.style.top = e.clientY + 'px';
+                document.body.appendChild(effect);
+            }
+            
+            setTimeout(() => effect.remove(), 800);
+        });
+        // Crown rotation support for WearOS
+        document.addEventListener('wheel', function(e) {
+            if (!appData.settings.crownEnabled) return;
+            
+            const speed = appData.settings.crownScrollSpeed;
+            const activeElement = document.activeElement;
+            if (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT') {
+                // Scroll inside input
+                activeElement.scrollTop += e.deltaY * speed;
+            } else {
+                // Scroll page
+                window.scrollBy(0, e.deltaY * speed);
+            }
+        });
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
