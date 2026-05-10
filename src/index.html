@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>倒计日</title>
     <style>
+    /* ================== 内置字体定义 ================== */
+    @font-face { font-family: 'Minecraft'; src: url('ttf/Minecraft.ttf'); }
+    @font-face { font-family: 'PoFly'; src: url('ttf/PoFly.ttf'); }
+    @font-face { font-family: 'Hand'; src: url('ttf/Hand.ttf'); }
+    @font-face { font-family: 'Fly'; src: url('ttf/Fly.ttf'); }
+    @font-face { font-family: 'AoYun-Song'; src: url('ttf/AoYun-Song.ttf'); }
+    @font-face { font-family: 'AoYun'; src: url('ttf/AoYun.ttf'); }
+    
     /* ================== SVG 图标库 ================== */
     .svg-icon {
       display: inline-block;
@@ -1297,6 +1305,79 @@
       font-size: 12px;
     }
 
+    /* 白噪音卡片 */
+    .whitenoise-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .whitenoise-current {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--card-text-color);
+      text-align: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .whitenoise-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .whitenoise-btn {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(69, 183, 209, 0.2));
+      border: 1px solid rgba(78, 205, 196, 0.3);
+      border-radius: 20px;
+      color: #4ecdc4;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .whitenoise-btn:hover {
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.3), rgba(69, 183, 209, 0.3));
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(78, 205, 196, 0.2);
+    }
+
+    .whitenoise-select {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .whitenoise-type-btn {
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: var(--card-text-color);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      font-size: 12px;
+    }
+
+    .whitenoise-type-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .whitenoise-type-btn.active {
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.25), rgba(69, 183, 209, 0.25));
+      border-color: rgba(78, 205, 196, 0.4);
+      color: #4ecdc4;
+      box-shadow: 0 0 12px rgba(78, 205, 196, 0.15);
+    }
+
     /* 提醒事项卡片 */
     .reminder-card-content {
       min-height: 100px;
@@ -2583,6 +2664,65 @@
       transform: scale(1.1)
     }
 
+    /* 头像预设 */
+    .avatar-preset {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .avatar-preset-option {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .avatar-preset-option:hover {
+      transform: scale(1.1);
+      border-color: #fff;
+    }
+
+    /* 毛玻璃特效禁用样式 */
+    body.glass-disabled .glass-effect,
+    body.glass-disabled .home-card,
+    body.glass-disabled .personal-card,
+    body.glass-disabled .profile-hero-card,
+    body.glass-disabled .nav-bar,
+    body.glass-disabled .settings-item,
+    body.glass-disabled .feature-card,
+    body.glass-disabled .countdown-card,
+    body.glass-disabled .water-card-content,
+    body.glass-disabled .reminder-card-content,
+    body.glass-disabled .kaomoji-pet {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    body.glass-disabled .glass-effect,
+    body.glass-disabled .home-card,
+    body.glass-disabled .personal-card,
+    body.glass-disabled .profile-hero-card,
+    body.glass-disabled .nav-bar,
+    body.glass-disabled .settings-item,
+    body.glass-disabled .feature-card,
+    body.glass-disabled .countdown-card {
+      background: rgba(0, 0, 0, 0.6) !important;
+    }
+
+    /* 打卡动画 */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
     /* ===== 主页卡片系统 ===== */
     .home-cards-container {
       display: flex;
@@ -3171,6 +3311,43 @@
       font-size: 16px;
       cursor: pointer;
       margin-top: 20px
+    }
+
+    /* ===== 悬浮球 ===== */
+    .floating-ball {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: rgba(var(--glass-color-r), var(--glass-color-g), var(--glass-color-b), 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      user-select: none;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .floating-ball:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .floating-ball:active {
+      transform: scale(0.95);
+    }
+
+    .floating-ball span {
+      color: #fff;
+      font-size: 28px;
+      font-weight: bold;
     }
 
     /* ===== 响铃铃声设置 ===== */
@@ -5025,6 +5202,7 @@
   <audio id="bgMusic" loop=""></audio>
   <audio id="alarmSound"></audio>
   <audio id="cardMusicPlayer"></audio>
+  <audio id="whiteNoiseAudio" loop=""></audio>
 
   <!-- 教程引导页面 - iOS26风格 -->
   <div id="tutorial-overlay" class="tutorial-overlay" style="position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background: linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%); z-index: 99999; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;">
@@ -6814,6 +6992,38 @@
         </div>
       </div>
 
+      <!-- 每日打卡 -->
+      <div class="personal-card" id="daily-checkin-card">
+        <div class="personal-card-title">✅ 每日打卡</div>
+        <div style="padding:20px;">
+          <div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:20px;">
+            <div>
+              <div id="checkin-total" style="font-size:28px;font-weight:600;color:var(--theme-color);">0</div>
+              <div style="font-size:12px;opacity:0.7;">总打卡天数</div>
+            </div>
+            <div>
+              <div id="checkin-missed" style="font-size:28px;font-weight:600;color:#ff6b6b;">0</div>
+              <div style="font-size:12px;opacity:0.7;">未打卡天数</div>
+            </div>
+            <div>
+              <div id="checkin-streak" style="font-size:28px;font-weight:600;color:#f9ca24;">0</div>
+              <div style="font-size:12px;opacity:0.7;">连续打卡</div>
+            </div>
+          </div>
+          <button id="checkin-btn" style="width:100%;padding:16px;background:var(--theme-color);border:none;border-radius:16px;color:#fff;cursor:pointer;font-size:16px;font-weight:600;transition:all 0.3s;">
+            🎯 今日打卡
+          </button>
+          <div id="checkin-animation" style="display:none;text-align:center;padding:20px;">
+            <div style="font-size:48px;animation:bounce 0.5s ease infinite;">🎉</div>
+            <div style="font-size:16px;color:var(--theme-color);margin-top:10px;">打卡成功！</div>
+          </div>
+          <div id="checkin-calendar" style="margin-top:20px;">
+            <div style="font-size:12px;opacity:0.7;margin-bottom:10px;">近期打卡记录</div>
+            <div id="checkin-dates" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- 白噪音 -->
       <div class="personal-card" id="white-noise-card">
         <div class="personal-card-title">🎵 白噪音</div>
@@ -6912,8 +7122,6 @@
 
         <!-- 按钮组 -->
         <div style="display:flex; gap:12px; justify-content:center; margin:20px 0; flex-wrap:wrap;">
-          <button class="personal-settings-btn" id="name-color-btn" style="margin:0; padding:10px 18px; font-size:13px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); border-radius:20px; color:#fff; cursor:pointer; transition:all 0.3s; backdrop-filter:blur(10px);">🖊️
-            设置名称颜色</button>
           <button class="personal-settings-btn" id="personal-settings-btn" style="margin:0; padding:10px 18px; font-size:13px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); border-radius:20px; color:#fff; cursor:pointer; transition:all 0.3s; backdrop-filter:blur(10px);">👤
             个人设置</button>
         </div>
@@ -6953,13 +7161,6 @@
             <button class="water-btn small" id="water-settings-btn">⚙️ 设置</button>
           </div>
         </div>
-      </div>
-
-      <!-- 提醒事项卡片 -->
-      <div class="personal-card" id="profile-reminder-card">
-        <div class="personal-card-title">⏰ 我的提醒</div>
-        <div class="reminder-card-content" id="profile-reminder-list"><div class="calendar-detail-empty">暂无提醒事项</div></div>
-        <button class="reminder-card-add" id="add-profile-reminder-btn">+ 添加提醒</button>
       </div>
 
       <!-- 颜文字宠物 -->
@@ -7217,13 +7418,6 @@
           <span class="settings-menu-arrow">›</span>
         </div>
         
-        <div class="settings-menu-item" data-setting="festival" onclick="openSettingsPage(&#39;festival&#39;)">
-          <span>
-            🎆 节日显示设置
-          </span>
-          <span class="settings-menu-arrow">›</span>
-        </div>
-        
         <div class="settings-menu-item" data-setting="virtualKeys" onclick="openSettingsPage(&#39;virtualKeys&#39;)">
           <span>
             🔘 虚拟触控按键
@@ -7298,6 +7492,15 @@
           <span>模糊</span>
         </div>
       </div>
+
+      <div class="settings-item">
+        <span class="settings-label">启用毛玻璃特效</span>
+        <label class="toggle">
+          <input type="checkbox" class="toggle-input" id="glass-effect-toggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <p style="font-size:12px;opacity:.7;margin:5px 0 15px 0;">关闭后所有UI将改为半透明样式，减少性能要求</p>
 
       <div class="settings-item">
         <span class="settings-label">页面动画类型</span>
@@ -7483,6 +7686,22 @@
             <input type="checkbox" class="toggle-input" id="use-system-font" checked="">
             <span class="toggle-slider"></span>
           </label>
+        </div>
+
+        <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+          <span class="settings-label" style="margin-bottom:10px;">选择应用内置字体</span>
+          <select class="form-input" id="builtin-font-select" style="width:100%;padding:10px;">
+            <option value="">不使用内置字体</option>
+            <option value="Minecraft">🟦 像素 - Minecraft</option>
+            <option value="PoFly">✈️ 飞扬体 - PoFly</option>
+            <option value="Hand">✍️ 手写体 - Hand</option>
+            <option value="Fly">🚀 飞驰体 - Fly</option>
+            <option value="AoYun-Song">🏆 奥运宋体 - AoYun-Song</option>
+            <option value="AoYun">🎖️ 奥运提 - AoYun</option>
+          </select>
+          <div class="font-preview" id="builtin-font-preview" style="margin-top: 10px; font-family: Minecraft;">
+            这是一段预览文字 - The quick brown fox
+          </div>
         </div>
 
         <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
@@ -7755,6 +7974,33 @@
             调整背景毛玻璃效果的模糊强度
           </div>
         </div>
+
+        <div class="settings-item">
+          <span class="settings-label">背景白噪音</span>
+          <label class="toggle">
+            <input type="checkbox" class="toggle-input" id="immersive-modules-noise-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div id="immersive-modules-noise-panel" style="display:none;">
+          <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+            <span class="settings-label" style="margin-bottom:10px;">选择白噪音</span>
+            <select class="form-input" id="immersive-modules-noise-select" style="width:100%;">
+              <option value="ocean">🌊 海洋</option>
+              <option value="river">🏞️ 河流</option>
+              <option value="rain">🌧️ 雨声</option>
+              <option value="night">🌙 夜晚</option>
+            </select>
+          </div>
+          <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+            <span class="settings-label" style="margin-bottom:10px;">音量</span>
+            <input type="range" class="form-input" id="immersive-modules-noise-volume" min="1" max="100" value="30" style="width:100%;">
+            <div style="text-align:center;width:100%;font-size:12px;opacity:.7;margin-top:5px;">
+              <span id="immersive-modules-noise-volume-value">30%</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="immersive-focus-panel" style="display:none;">
@@ -7781,6 +8027,33 @@
           </div>
           <div style="font-size:12px; opacity:0.6; margin-top:8px; line-height:1.5;">
             调整背景毛玻璃效果的模糊强度
+          </div>
+        </div>
+
+        <div class="settings-item">
+          <span class="settings-label">背景白噪音</span>
+          <label class="toggle">
+            <input type="checkbox" class="toggle-input" id="immersive-focus-noise-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div id="immersive-focus-noise-panel" style="display:none;">
+          <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+            <span class="settings-label" style="margin-bottom:10px;">选择白噪音</span>
+            <select class="form-input" id="immersive-focus-noise-select" style="width:100%;">
+              <option value="ocean">🌊 海洋</option>
+              <option value="river">🏞️ 河流</option>
+              <option value="rain">🌧️ 雨声</option>
+              <option value="night">🌙 夜晚</option>
+            </select>
+          </div>
+          <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+            <span class="settings-label" style="margin-bottom:10px;">音量</span>
+            <input type="range" class="form-input" id="immersive-focus-noise-volume" min="1" max="100" value="30" style="width:100%;">
+            <div style="text-align:center;width:100%;font-size:12px;opacity:.7;margin-top:5px;">
+              <span id="immersive-focus-noise-volume-value">30%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -7818,6 +8091,15 @@
           <span class="toggle-slider"></span>
         </label>
       </div>
+
+      <div class="settings-item">
+        <span class="settings-label">隐藏退出按钮</span>
+        <label class="toggle">
+          <input type="checkbox" class="toggle-input" id="immersive-hide-exit-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <p style="font-size:12px; opacity:0.7; margin-top:8px;">开启后退出按钮透明，但仍然可以点击退出</p>
 
       <div class="modal-btns">
         <button class="modal-btn confirm-btn" id="enter-immersive-btn">进入沉浸模式</button>
@@ -7957,6 +8239,18 @@
       </div>
       <div style="font-size:12px; opacity:0.6; margin-top:8px; line-height:1.5;">
         关闭后上传的图片/音乐/字体将不再压缩，可保留最佳质量，但会占用更多存储空间
+      </div>
+
+      <!-- 更多扩展功能 -->
+      <div class="settings-item" style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+        <span class="settings-label">更多扩展功能</span>
+        <label class="toggle">
+          <input type="checkbox" class="toggle-input" id="more-extensions-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div style="font-size:12px; opacity:0.6; margin-top:8px; line-height:1.5;">
+        开启后在功能页面显示排班表、笔记、AI助手、密码本等扩展卡片
       </div>
 
       <!-- 其他功能 -->
@@ -8312,16 +8606,24 @@
       <h3 class="settings-title">手势设置</h3>
 
       <div class="settings-item">
-        <span class="settings-label">开启右滑返回</span>
+        <span class="settings-label">开启滑动返回</span>
         <label class="toggle">
           <input type="checkbox" class="toggle-input" id="swipe-back-toggle">
           <span class="toggle-slider"></span>
         </label>
       </div>
 
+      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+        <span class="settings-label" style="margin-bottom:10px;">滑动方向</span>
+        <select class="form-input" id="swipe-direction" style="width:100%;">
+          <option value="right">右滑返回</option>
+          <option value="left">左滑返回</option>
+        </select>
+      </div>
+
       <div style="margin-top:30px;">
         <div class="settings-item" style="margin-bottom:15px;">
-          <span class="settings-label">右滑返回检测范围</span>
+          <span class="settings-label">滑动返回检测范围</span>
           <span id="swipe-range-value" style="color:var(--theme-color);font-weight:600;">30%</span>
         </div>
         <input type="range" id="swipe-range-slider" min="10" max="100" value="30" step="5" style="width:100%; height:8px; border-radius:4px; background:rgba(255,255,255,0.2); outline:none; -webkit-appearance:none;">
@@ -8332,10 +8634,33 @@
         </div>
       </div>
 
+      <div style="margin-top:30px;">
+        <div class="settings-item">
+          <span class="settings-label">左右滑动切换主页面</span>
+          <label class="toggle">
+            <input type="checkbox" class="toggle-input" id="swipe-switch-page-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <p style="font-size:12px; opacity:0.7; margin-top:8px;">开启后在主页之间左右滑动可切换页面</p>
+      </div>
+
+      <div style="margin-top:30px;">
+        <div class="settings-item">
+          <span class="settings-label">悬浮球返回</span>
+          <label class="toggle">
+            <input type="checkbox" class="toggle-input" id="floating-ball-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <p style="font-size:12px; opacity:0.7; margin-top:8px;">开启后显示可拖动的悬浮球，点击即可返回</p>
+      </div>
+
       <div style="margin-top:20px; padding:20px; background:rgba(var(--glass-color-r),var(--glass-color-g),var(--glass-color-b),var(--glass-opacity)); border-radius:var(--border-radius); font-size:14px; line-height:1.6; color:var(--card-text-color); border:1px solid rgba(255,255,255,0.1);">
         <p style="margin-bottom:15px; font-weight:600; color:var(--theme-color);">功能说明</p>
-        <p style="margin-bottom:10px; opacity:0.9;">开启右滑返回后，可以在任意页面从屏幕左侧向右滑动来返回上一个页面。</p>
-        <p style="margin-top:15px; font-size:12px; opacity:0.6;">💡 检测范围表示从屏幕左边缘开始多少比例的宽度内可以触发右滑返回</p>
+        <p style="margin-bottom:10px; opacity:0.9;">开启滑动返回后，可以在任意页面从屏幕边缘滑动来返回上一个页面。</p>
+        <p style="margin-bottom:10px; opacity:0.9;">悬浮球可以拖动到屏幕任意位置，点击即可快速返回。</p>
+        <p style="margin-top:15px; font-size:12px; opacity:0.6;">💡 检测范围表示从屏幕边缘开始多少比例的宽度内可以触发滑动返回</p>
       </div>
 
       <button class="glass-btn" id="save-gesture-settings" style="width:100%; margin-top:20px; background:var(--theme-color);">保存设置</button>
@@ -8358,6 +8683,27 @@
           <div class="color-option bg-white" data-bg="white"></div>
           <div class="color-option bg-black" data-bg="black"></div>
           <div class="color-option bg-grapefruit" data-bg="grapefruit"></div>
+        </div>
+      </div>
+
+      <div class="settings-item">
+        <span class="settings-label">iOS预设壁纸</span>
+        <div id="ios-wallpaper-preset" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div class="wallpaper-option" data-wallpaper="wallpaper/wallpapersun.jpg" style="width: 100px; height: 100px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 2px solid transparent;">
+            <img src="wallpaper/wallpapersun.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="wallpaper-option" data-wallpaper="wallpaper/wallpaperpurp.jpg" style="width: 100px; height: 100px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 2px solid transparent;">
+            <img src="wallpaper/wallpaperpurp.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="wallpaper-option" data-wallpaper="wallpaper/wallpaperdark.jpg" style="width: 100px; height: 100px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 2px solid transparent;">
+            <img src="wallpaper/wallpaperdark.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="wallpaper-option" data-wallpaper="wallpaper/wallpaperBlack.jpg" style="width: 100px; height: 100px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 2px solid transparent;">
+            <img src="wallpaper/wallpaperBlack.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="wallpaper-option" data-wallpaper="wallpaper/wallpapercarplay.jpg" style="width: 100px; height: 100px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 2px solid transparent;">
+            <img src="wallpaper/wallpapercarplay.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
         </div>
       </div>
 
@@ -8586,6 +8932,51 @@
     <button class="sub-page-back" data-back="page-settings">返回</button>
     <div class="container" style="padding-top:50px;">
       <h3 class="settings-title">响铃铃声设置</h3>
+
+      <div class="settings-item" style="justify-content:center;">
+        <div id="alarm-preset-list" style="display:flex; flex-direction:column; align-items:center; width:80%; max-width:400px;">
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/Cloudscape.ogg" id="preset-cloudscape">
+            <label for="preset-cloudscape" class="alarm-sound-name">Cloudscape</label>
+            <button class="alarm-sound-play" data-sound="tipsound/Cloudscape.ogg">▶</button>
+          </div>
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/Weather.ogg" id="preset-weather">
+            <label for="preset-weather" class="alarm-sound-name">Weather</label>
+            <button class="alarm-sound-play" data-sound="tipsound/Weather.ogg">▶</button>
+          </div>
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/Rise.ogg" id="preset-rise">
+            <label for="preset-rise" class="alarm-sound-name">Rise</label>
+            <button class="alarm-sound-play" data-sound="tipsound/Rise.ogg">▶</button>
+          </div>
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/Neo.ogg" id="preset-neo">
+            <label for="preset-neo" class="alarm-sound-name">Neo</label>
+            <button class="alarm-sound-play" data-sound="tipsound/Neo.ogg">▶</button>
+          </div>
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/wind.ogg" id="preset-wind">
+            <label for="preset-wind" class="alarm-sound-name">Wind</label>
+            <button class="alarm-sound-play" data-sound="tipsound/wind.ogg">▶</button>
+          </div>
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/tune.ogg" id="preset-tune">
+            <label for="preset-tune" class="alarm-sound-name">Tune</label>
+            <button class="alarm-sound-play" data-sound="tipsound/tune.ogg">▶</button>
+          </div>
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/feeling.ogg" id="preset-feeling">
+            <label for="preset-feeling" class="alarm-sound-name">Feeling</label>
+            <button class="alarm-sound-play" data-sound="tipsound/feeling.ogg">▶</button>
+          </div>
+          <div class="alarm-sound-item" style="width:100%;">
+            <input type="radio" name="alarm-preset" value="tipsound/dingling.ogg" id="preset-dingling">
+            <label for="preset-dingling" class="alarm-sound-name">Dingling</label>
+            <button class="alarm-sound-play" data-sound="tipsound/dingling.ogg">▶</button>
+          </div>
+        </div>
+      </div>
 
       <div class="settings-item">
         <span class="settings-label">上传自定义铃声</span>
@@ -8821,6 +9212,12 @@
         <select class="form-input" id="landscape-font-select" style="width:100%;">
           <option value="system">系统默认</option>
           <option value="custom">使用上传的字体</option>
+          <option value="Minecraft">🟦 像素 - Minecraft</option>
+          <option value="PoFly">✈️ 飞扬体 - PoFly</option>
+          <option value="Hand">✍️ 手写体 - Hand</option>
+          <option value="Fly">🚀 飞驰体 - Fly</option>
+          <option value="AoYun-Song">🏆 奥运宋体 - AoYun-Song</option>
+          <option value="AoYun">🎖️ 奥运提 - AoYun</option>
         </select>
       </div>
 
@@ -8829,6 +9226,42 @@
         <input type="range" class="form-input" id="landscape-font-size" min="24" max="96" value="48" style="width:100%;">
         <div style="text-align:center;width:100%;font-size:12px;opacity:.7;margin-top:5px;">
           <span id="landscape-font-size-value">48px</span>
+        </div>
+      </div>
+
+      <div class="settings-item">
+        <span class="settings-label">隐藏退出按钮</span>
+        <label class="toggle">
+          <input type="checkbox" class="toggle-input" id="landscape-hide-exit-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <p style="font-size:12px; opacity:0.7; margin-top:8px;">开启后退出按钮透明，但仍然可以点击退出</p>
+
+      <div class="settings-item">
+        <span class="settings-label">背景白噪音</span>
+        <label class="toggle">
+          <input type="checkbox" class="toggle-input" id="landscape-noise-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div id="landscape-noise-panel" style="display:none;">
+        <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+          <span class="settings-label" style="margin-bottom:10px;">选择白噪音</span>
+          <select class="form-input" id="landscape-noise-select" style="width:100%;">
+            <option value="ocean">🌊 海洋</option>
+            <option value="river">🏞️ 河流</option>
+            <option value="rain">🌧️ 雨声</option>
+            <option value="night">🌙 夜晚</option>
+          </select>
+        </div>
+        <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+          <span class="settings-label" style="margin-bottom:10px;">音量</span>
+          <input type="range" class="form-input" id="landscape-noise-volume" min="1" max="100" value="30" style="width:100%;">
+          <div style="text-align:center;width:100%;font-size:12px;opacity:.7;margin-top:5px;">
+            <span id="landscape-noise-volume-value">30%</span>
+          </div>
         </div>
       </div>
 
@@ -9158,7 +9591,7 @@
       
       <!-- 顶部毛玻璃卡片 -->
       <div class="about-hero-card">
-        <div class="about-icon">📅</div>
+        <img class="about-icon" src="icon/icon.png" alt="应用图标" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%234ecdc4%22/%3E%3Ctext x=%2250%22 y=%2255%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23fff%22%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E';">
         <h1 class="about-title">CountDown Day</h1>
         <p class="about-subtitle">记录每一个重要时刻</p>
       </div>
@@ -9324,9 +9757,13 @@
     }
     
     .about-icon {
-      font-size: 64px;
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
       margin-bottom: 16px;
       animation: pulse 2s ease-in-out infinite;
+      object-fit: cover;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
     
     @keyframes pulse {
@@ -9673,7 +10110,9 @@
       }
       
       .about-icon {
-        font-size: 48px;
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
       }
       
       .about-title {
@@ -9773,7 +10212,9 @@
       }
       
       .about-icon {
-        font-size: 40px;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
       }
       
       .about-title {
@@ -9960,6 +10401,56 @@
         <input type="file" class="avatar-upload" id="avatar-upload-personal" accept="image/*">
       </div>
 
+      <!-- 头像预设 -->
+      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+        <span class="settings-label" style="margin-bottom:10px;">头像预设</span>
+        <div class="avatar-preset" id="avatar-preset">
+          <div class="avatar-preset-option" data-avatar="👤" style="background:#4ecdc4;">👤</div>
+          <div class="avatar-preset-option" data-avatar="🌟" style="background:#f9ca24;">🌟</div>
+          <div class="avatar-preset-option" data-avatar="💎" style="background:#a55eea;">💎</div>
+          <div class="avatar-preset-option" data-avatar="🔥" style="background:#ff6b6b;">🔥</div>
+          <div class="avatar-preset-option" data-avatar="💧" style="background:#45b7d1;">💧</div>
+          <div class="avatar-preset-option" data-avatar="🌈" style="background:#fd79a8;">🌈</div>
+          <div class="avatar-preset-option" data-avatar="🐱" style="background:#fdcb6e;">🐱</div>
+          <div class="avatar-preset-option" data-avatar="🦋" style="background:#00b894;">🦋</div>
+        </div>
+      </div>
+
+      <!-- Emoji头像 -->
+      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+        <span class="settings-label" style="margin-bottom:10px;">Emoji头像</span>
+        <input type="text" class="form-input" id="emoji-avatar-input" placeholder="输入Emoji作为头像" maxlength="2" style="width:100%;">
+        <button class="personal-settings-btn" id="save-emoji-avatar" style="margin-top:10px;">使用Emoji头像</button>
+      </div>
+
+      <!-- 文字头像 -->
+      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+        <span class="settings-label" style="margin-bottom:10px;">文字头像</span>
+        <input type="text" class="form-input" id="text-avatar-input" placeholder="输入一个字作为头像" maxlength="1" style="width:100%;">
+        <button class="personal-settings-btn" id="save-text-avatar" style="margin-top:10px;">使用文字头像</button>
+      </div>
+
+      <!-- 头像底色 -->
+      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+        <span class="settings-label" style="margin-bottom:10px;">头像底色</span>
+        <input type="color" class="form-input" id="avatar-bg-color" value="#4ecdc4" style="width:100%;height:40px;">
+        <button class="personal-settings-btn" id="save-avatar-bg" style="margin-top:10px;">保存底色</button>
+      </div>
+
+      <!-- 头像滤镜 -->
+      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+        <span class="settings-label" style="margin-bottom:10px;">头像滤镜</span>
+        <select class="form-input" id="avatar-filter" style="width:100%;">
+          <option value="none">无滤镜</option>
+          <option value="grayscale">黑白</option>
+          <option value="sepia">复古</option>
+          <option value="brightness">明亮</option>
+          <option value="contrast">高对比</option>
+          <option value="saturate">饱和</option>
+        </select>
+        <button class="personal-settings-btn" id="save-avatar-filter" style="margin-top:10px;">应用滤镜</button>
+      </div>
+
       <!-- 昵称设置 -->
       <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
         <span class="settings-label" style="margin-bottom:10px;">昵称设置</span>
@@ -9967,31 +10458,10 @@
         <button class="personal-settings-btn" id="save-name-personal" style="margin-top:10px;">保存昵称</button>
       </div>
 
-      <!-- 个性签名设置 -->
+      <!-- 名称颜色 -->
       <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
-        <span class="settings-label" style="margin-bottom:10px;">个性签名</span>
-        <textarea class="form-input" id="personal-signature-input" placeholder="输入个性签名（最多50字）" maxlength="50" style="width:100%;height:80px;resize:none;"></textarea>
-        <button class="personal-settings-btn" id="save-signature-personal" style="margin-top:10px;">保存签名</button>
-      </div>
-
-      <!-- 出生日期设置 -->
-      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
-        <span class="settings-label" style="margin-bottom:10px;">出生日期</span>
-        <input type="date" class="form-input" id="personal-birthday-input" style="width:100%;">
-        <button class="personal-settings-btn" id="save-birthday-personal" style="margin-top:10px;">保存生日</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== 用户名称颜色设置页面 ===== -->
-  <div class="page sub-page" id="page-name-color">
-    <button class="sub-page-back" data-back="page-profile">返回</button>
-    <div class="container" style="padding-top:50px;">
-      <h3 class="settings-title">设置名称颜色</h3>
-
-      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
-        <span class="settings-label" style="margin-bottom:15px;">选择名称颜色</span>
-        <div class="name-color-preset" id="name-color-preset">
+        <span class="settings-label" style="margin-bottom:15px;">名称颜色</span>
+        <div class="name-color-preset" id="name-color-preset-personal">
           <div class="name-color-option" style="background:#ffffff" data-color="#ffffff"></div>
           <div class="name-color-option" style="background:#ff6b6b" data-color="#ff6b6b"></div>
           <div class="name-color-option" style="background:#4ecdc4" data-color="#4ecdc4"></div>
@@ -10007,16 +10477,22 @@
           <div class="name-color-option" style="background:#0984e3" data-color="#0984e3"></div>
           <div class="name-color-option" style="background:#2d3436" data-color="#2d3436"></div>
         </div>
-        <div style="margin-top:10px;font-size:12px;opacity:.7;">点击颜色预览效果</div>
+        <input type="color" class="form-input" id="custom-name-color-personal" value="#ffffff" style="width:100%;height:40px;margin-top:10px;">
+        <button class="personal-settings-btn" id="save-name-color-personal" style="margin-top:10px;">保存名称颜色</button>
       </div>
 
+      <!-- 个性签名设置 -->
       <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
-        <span class="settings-label" style="margin-bottom:10px;">自定义颜色</span>
-        <input type="color" class="form-input" id="custom-name-color" value="#ffffff" style="width:100%;height:40px;">
+        <span class="settings-label" style="margin-bottom:10px;">个性签名</span>
+        <textarea class="form-input" id="personal-signature-input" placeholder="输入个性签名（最多50字）" maxlength="50" style="width:100%;height:80px;resize:none;"></textarea>
+        <button class="personal-settings-btn" id="save-signature-personal" style="margin-top:10px;">保存签名</button>
       </div>
 
-      <div class="modal-btns">
-        <button class="modal-btn confirm-btn" id="save-name-color">保存颜色</button>
+      <!-- 出生日期设置 -->
+      <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+        <span class="settings-label" style="margin-bottom:10px;">出生日期</span>
+        <input type="date" class="form-input" id="personal-birthday-input" style="width:100%;">
+        <button class="personal-settings-btn" id="save-birthday-personal" style="margin-top:10px;">保存生日</button>
       </div>
     </div>
   </div>
@@ -10078,6 +10554,39 @@
           <div class="feature-icon">🛠️</div>
           <div class="feature-name">实用工具</div>
           <div class="feature-desc">更多实用小工具</div>
+        </div>
+      </div>
+
+      <!-- 更多扩展功能卡片 -->
+      <div id="more-extensions-section" style="display: none; margin-top: 30px;">
+        <div class="page-header" style="margin: 20px 0; text-align: left;">
+          <h3 class="page-title" style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">📦 更多</h3>
+        </div>
+        
+        <div class="features-grid">
+          <div class="feature-card" id="feature-aiclass" data-file="plushtml/aiclass.html">
+            <div class="feature-icon">📅</div>
+            <div class="feature-name">排班表</div>
+            <div class="feature-desc">课程表与排班管理</div>
+          </div>
+
+          <div class="feature-card" id="feature-nextpen" data-file="plushtml/NextPen1.6.0.html">
+            <div class="feature-icon">📝</div>
+            <div class="feature-name">笔记卡片</div>
+            <div class="feature-desc">便捷的笔记工具</div>
+          </div>
+
+          <div class="feature-card" id="feature-aichat" data-file="plushtml/ai-chat.html">
+            <div class="feature-icon">🤖</div>
+            <div class="feature-name">部署AI</div>
+            <div class="feature-desc">AI聊天助手</div>
+          </div>
+
+          <div class="feature-card" id="feature-keynote" data-file="plushtml/keynote.html">
+            <div class="feature-icon">🔐</div>
+            <div class="feature-name">密码本</div>
+            <div class="feature-desc">安全的密码管理</div>
+          </div>
         </div>
       </div>
     </div>
@@ -10300,6 +10809,10 @@
         <div class="card-type-option" data-type="water">
           <div class="icon">💧</div>
           <div class="label">喝水提醒</div>
+        </div>
+        <div class="card-type-option" data-type="whitenoise">
+          <div class="icon">🎧</div>
+          <div class="label">白噪音卡片</div>
         </div>
         <div class="card-type-option" data-type="extension">
           <div class="icon">🔌</div>
@@ -10538,6 +11051,31 @@
     </div>
   </div>
 
+  <!-- ===== 白噪音卡片编辑弹窗 ===== -->
+  <div class="modal" id="whitenoise-card-modal">
+    <div class="modal-content">
+      <h3 class="modal-title">编辑白噪音卡片</h3>
+      <input type="hidden" id="whitenoise-card-id">
+      <div class="form-group">
+        <label class="form-label">卡片标题</label>
+        <input type="text" class="form-input" id="whitenoise-card-title" placeholder="输入标题">
+      </div>
+      <div class="form-group">
+        <label class="form-label">默认白噪音</label>
+        <select class="form-input" id="whitenoise-card-noise-type">
+          <option value="ocean">🌊 海洋</option>
+          <option value="river">🏞️ 河流</option>
+          <option value="rain">🌧️ 雨声</option>
+          <option value="night">🌙 夜晚</option>
+        </select>
+      </div>
+      <div class="modal-btns">
+        <button class="modal-btn confirm-btn" id="save-whitenoise-card">保存</button>
+        <button class="modal-btn cancel-btn" id="cancel-whitenoise-card">取消</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 扩展卡片编辑弹窗 ===== -->
   <div class="modal" id="extension-card-modal">
     <div class="modal-content">
@@ -10653,6 +11191,17 @@
     </div>
   </div>
 
+  <!-- ===== 倒计时结束弹窗 ===== -->
+  <div class="modal" id="countdown-expired-modal">
+    <div class="modal-content">
+      <h3 class="modal-title" id="countdown-expired-title">🎉</h3>
+      <p id="countdown-expired-message" style="text-align:center;font-size:18px;margin-bottom:20px;"></p>
+      <div class="modal-btns">
+        <button class="modal-btn confirm-btn" id="close-countdown-expired">知道了</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 沉浸模式页面 ===== -->
   <div class="immersive-page" id="immersive-page" onclick="if(event.target===this)exitImmersiveMode()">
     <button class="immersive-exit-btn" id="immersive-exit-btn" onclick="document.getElementById(&#39;immersive-page&#39;).style.display=&#39;none&#39;;document.getElementById(&#39;immersive-page&#39;).classList.remove(&#39;active&#39;);clearInterval(immersiveInterval);if(screen.orientation&amp;&amp;screen.orientation.unlock){screen.orientation.unlock();}" style="z-index:99999 !important;pointer-events:all !important;position:absolute !important;top:20px !important;right:20px !important;background:#f44336 !important;color:white !important;border:none !important;padding:12px 24px !important;border-radius:20px !important;font-size:16px !important;box-shadow:0 4px 8px rgba(0,0,0,0.4) !important;">退出</button>
@@ -10714,6 +11263,11 @@
     <div class="landscape-display-time" id="landscape-display-time">00:00</div>
     <button class="landscape-upload-btn" id="landscape-upload-btn">上传图片</button>
     <input type="file" id="landscape-file-input" accept="image/*" style="display:none;">
+  </div>
+
+  <!-- ===== 悬浮球 ===== -->
+  <div class="floating-ball" id="floating-ball" style="display:none;">
+    <span>←</span>
   </div>
 
   <!-- ===== 扩展预览页面 ===== -->
@@ -10829,7 +11383,6 @@
       password: { icon: '🔐', name: '密码设置' },
       immersive: { icon: '🎭', name: '沉浸模式' },
       alarm: { icon: '🔔', name: '响铃铃声' },
-      festival: { icon: '⭐', name: '节日显示设置' },
       bg: { icon: '🖼️', name: '背景设置' },
       effect: { icon: '✨', name: '特效设置' },
       splash: { icon: '🚀', name: '开屏设置' },
@@ -10842,6 +11395,7 @@
       water: { icon: '💧', name: '喝水提醒' },
       virtualKeys: { icon: '🔘', name: '虚拟触控按键' },
       gesture: { icon: '👆', name: '手势设置' },
+      more: { icon: '⚙️', name: '更多设置' },
       about: { icon: 'ℹ️', name: '关于' },
       storage: { icon: '💾', name: '存储空间' },
       update: { icon: '🔄', name: '更新设置' },
@@ -11448,17 +12002,47 @@
     /* ================== 响铃铃声 ================== */
     function playAlarm() {
       const alarm = document.getElementById('alarmSound');
-      if (appData.settings.alarm.sound) {
-        alarm.src = appData.settings.alarm.sound;
-        alarm.volume = appData.settings.alarm.volume / 100;
-        alarm.play().catch(() => { });
-      }
+      const soundPath = appData.settings.alarm?.sound || 'tipsound/Cloudscape.ogg';
+      alarm.src = soundPath;
+      alarm.volume = (appData.settings.alarm?.volume || 80) / 100;
+      alarm.loop = true;
+      alarm.play().catch(() => { });
     }
 
     function stopAlarm() {
       const alarm = document.getElementById('alarmSound');
       alarm.pause();
       alarm.currentTime = 0;
+      alarm.loop = false;
+    }
+
+    function showCountdownExpiredModal(countdown) {
+      const modal = document.getElementById('countdown-expired-modal');
+      const message = document.getElementById('countdown-expired-message');
+      message.textContent = countdown.expiredText || `${countdown.name}时间到啦！`;
+      modal.classList.add('show');
+      playAlarm();
+    }
+
+    function closeCountdownExpiredModal() {
+      const modal = document.getElementById('countdown-expired-modal');
+      modal.classList.remove('show');
+      stopAlarm();
+    }
+
+    function checkCountdownExpired() {
+      if (!appData.countdowns) return;
+      
+      const now = Date.now();
+      appData.countdowns.forEach(countdown => {
+        const targetTime = new Date(countdown.targetTime).getTime();
+        const diff = targetTime - now;
+        
+        if (diff <= 0 && diff > -2000 && !countdown._expiredNotified) {
+          countdown._expiredNotified = true;
+          showCountdownExpiredModal(countdown);
+        }
+      });
     }
 
     /* ================== 本地存储 ================== */
@@ -11637,8 +12221,8 @@
             border-radius: 25px !important;
           }
           body.round-watch-mode .nav-bar {
-            border-radius: 30px 30px 0 0 !important;
-            padding: 8px 5px !important;
+            border-radius: 30px 30px 0 0;
+            padding: 8px 5px;
           }
           body.round-watch-mode .countdown-display {
             transform: scale(0.75);
@@ -12083,7 +12667,9 @@
       root.style.setProperty('--glass-color-g', g);
       root.style.setProperty('--glass-color-b', b);
 
-      if (appData.settings.font.system && appData.settings.font.system !== 'system') {
+      if (appData.settings.font.builtin) {
+        root.style.setProperty('--font-family', `'${appData.settings.font.builtin}', -apple-system, BlinkMacSystemFont, sans-serif`);
+      } else if (appData.settings.font.system && appData.settings.font.system !== 'system') {
         root.style.setProperty('--font-family', appData.settings.font.system);
       } else if (!appData.settings.font.useSystem && appData.settings.font.custom) {
         root.style.setProperty('--font-family', "'CustomFont', -apple-system, BlinkMacSystemFont, sans-serif");
@@ -12097,6 +12683,160 @@
     function applyUIMode() {
       const isLight = appData.settings.ui.uiMode === 'light';
       document.body.classList.toggle('light-mode', isLight);
+    }
+
+    function applyGlassEffect(enabled) {
+      if (enabled === undefined) {
+        enabled = appData.settings.ui.glassEffect !== false;
+      }
+      document.body.classList.toggle('glass-disabled', !enabled);
+    }
+
+    /* ================== 每日打卡 ================== */
+    function initCheckin() {
+      if (!appData.checkin) {
+        appData.checkin = {
+          records: [],
+          totalDays: 0,
+          streak: 0
+        };
+      }
+      updateCheckinDisplay();
+      renderCheckinCalendar();
+    }
+
+    function updateCheckinDisplay() {
+      const totalDays = appData.checkin.totalDays || 0;
+      const streak = appData.checkin.streak || 0;
+      const today = getTodayString();
+      const records = appData.checkin.records || [];
+      
+      let missedDays = 0;
+      if (records.length > 0) {
+        const firstDate = new Date(records[0]);
+        const lastDate = new Date(records[records.length - 1]);
+        const daysBetween = Math.floor((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+        missedDays = daysBetween - records.length;
+      }
+
+      document.getElementById('checkin-total').textContent = totalDays;
+      document.getElementById('checkin-missed').textContent = missedDays;
+      document.getElementById('checkin-streak').textContent = streak;
+
+      const checkinBtn = document.getElementById('checkin-btn');
+      if (checkinBtn) {
+        if (records.includes(today)) {
+          checkinBtn.textContent = '✅ 今日已打卡';
+          checkinBtn.disabled = true;
+          checkinBtn.style.background = '#666';
+        } else {
+          checkinBtn.textContent = '🎯 今日打卡';
+          checkinBtn.disabled = false;
+          checkinBtn.style.background = 'var(--theme-color)';
+        }
+      }
+    }
+
+    function renderCheckinCalendar() {
+      const datesContainer = document.getElementById('checkin-dates');
+      if (!datesContainer) return;
+
+      const records = appData.checkin.records || [];
+      const today = new Date();
+      const dates = [];
+
+      for (let i = 13; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        dates.push({
+          date: date,
+          string: getDateString(date),
+          checked: records.includes(getDateString(date)),
+          isToday: i === 0
+        });
+      }
+
+      datesContainer.innerHTML = dates.map(d => `
+        <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;${d.isToday ? 'border:2px solid var(--theme-color);' : ''}${d.checked ? 'background:var(--theme-color);color:#fff;' : 'background:rgba(255,255,255,0.1);color:#fff;'}">
+          ${d.date.getDate()}
+        </div>
+      `).join('');
+    }
+
+    function getTodayString() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function getDateString(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function checkin() {
+      const today = getTodayString();
+      const records = appData.checkin.records || [];
+      
+      if (records.includes(today)) {
+        return;
+      }
+
+      records.push(today);
+      appData.checkin.records = records.sort();
+      appData.checkin.totalDays = records.length;
+
+      updateStreak();
+
+      saveData();
+      showCheckinAnimation();
+      updateCheckinDisplay();
+      renderCheckinCalendar();
+    }
+
+    function updateStreak() {
+      const records = appData.checkin.records || [];
+      if (records.length === 0) {
+        appData.checkin.streak = 0;
+        return;
+      }
+
+      records.sort();
+      let streak = 1;
+      const today = new Date();
+      let checkDate = new Date(today);
+      checkDate.setDate(checkDate.getDate() - 1);
+
+      for (let i = records.length - 1; i > 0; i--) {
+        const recordDate = new Date(records[i]);
+        const prevRecordDate = new Date(records[i - 1]);
+        
+        const diffDays = Math.floor((recordDate - prevRecordDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+
+      appData.checkin.streak = streak;
+    }
+
+    function showCheckinAnimation() {
+      const animation = document.getElementById('checkin-animation');
+      const checkinBtn = document.getElementById('checkin-btn');
+      
+      if (checkinBtn) checkinBtn.style.display = 'none';
+      if (animation) animation.style.display = 'block';
+      
+      setTimeout(() => {
+        if (animation) animation.style.display = 'none';
+        if (checkinBtn) {
+          checkinBtn.style.display = 'block';
+          checkinBtn.textContent = '✅ 今日已打卡';
+          checkinBtn.disabled = true;
+          checkinBtn.style.background = '#666';
+        }
+      }, 2000);
     }
 
     function loadData() {
@@ -12578,6 +13318,27 @@
         </div>
       `;
           break;
+        case 'whitenoise':
+          const noiseIcons = { ocean: '🌊', river: '🏞️', rain: '🌧️', night: '🌙' };
+          const noiseNames = { ocean: '海洋', river: '河流', rain: '雨声', night: '夜晚' };
+          content = `
+        <div class="home-card-title">${card.title || '白噪音'}</div>
+        <div class="whitenoise-card-content">
+          <div class="whitenoise-current">${noiseIcons[card.noiseType] || '🎧'} ${noiseNames[card.noiseType] || '选择噪音'}</div>
+          <div class="whitenoise-controls">
+            <button class="whitenoise-btn" onclick="toggleWhiteNoiseCard('${card.id}')">${currentNoiseType === card.noiseType ? '⏹️ 停止' : '▶️ 播放'}</button>
+          </div>
+          <div class="whitenoise-select">
+            ${['ocean', 'river', 'rain', 'night'].map(type => `
+              <button class="whitenoise-type-btn ${currentNoiseType === type ? 'active' : ''}" 
+                      onclick="selectWhiteNoiseType('${card.id}', '${type}')">
+                ${noiseIcons[type]}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+          break;
         case 'extension':
           content = `
         <div class="home-card-title">${card.title || '扩展卡片'}</div>
@@ -13055,6 +13816,13 @@
       document.getElementById('water-card-modal').classList.add('show');
     }
 
+    function openWhiteNoiseCardModal(card = null) {
+      document.getElementById('whitenoise-card-id').value = card ? card.id : '';
+      document.getElementById('whitenoise-card-title').value = card ? card.title : '';
+      document.getElementById('whitenoise-card-noise-type').value = card ? card.noiseType : 'ocean';
+      document.getElementById('whitenoise-card-modal').classList.add('show');
+    }
+
     function openExtensionCardModal(card = null) {
       document.getElementById('extension-card-id').value = card ? card.id : '';
       document.getElementById('extension-card-title').value = card ? card.title : '';
@@ -13261,9 +14029,27 @@
         // 生成模块内容
         content.innerHTML = renderImmersiveModules(validModules);
 
+        // 应用退出按钮隐藏设置
+        const exitBtn = document.getElementById('immersive-exit-btn');
+        if (appData.settings.immersive.hideExit && exitBtn) {
+          exitBtn.style.opacity = '0';
+          exitBtn.style.cursor = 'pointer';
+          exitBtn.style.pointerEvents = 'auto';
+        } else if (exitBtn) {
+          exitBtn.style.opacity = '1';
+        }
+
         // 自动旋转
         if (appData.settings.immersive.autoRotate && screen.orientation && screen.orientation.lock) {
           screen.orientation.lock('landscape').catch(() => { });
+        }
+
+        // 播放模块模式白噪音
+        const modulesSettings = appData.settings.immersive.modules || {};
+        if (modulesSettings.noiseEnabled) {
+          const noiseType = modulesSettings.noiseType || 'ocean';
+          const noiseVolume = (modulesSettings.noiseVolume || 30) / 100;
+          createNoiseAudio(noiseType, noiseVolume);
         }
 
         // 更新模块内容
@@ -13522,6 +14308,9 @@
         immersiveInterval = null;
       }
 
+      // 停止白噪音
+      stopWhiteNoise();
+
       if (screen.orientation && screen.orientation.unlock) {
         screen.orientation.unlock().catch(() => { });
       }
@@ -13538,6 +14327,16 @@
 
       iframe.srcdoc = appData.settings.immersive.htmlContent;
       page.classList.add('active');
+
+      // 应用退出按钮隐藏设置
+      const exitBtn = document.getElementById('immersive-html-exit-btn');
+      if (appData.settings.immersive.hideExit && exitBtn) {
+        exitBtn.style.opacity = '0';
+        exitBtn.style.cursor = 'pointer';
+        exitBtn.style.pointerEvents = 'auto';
+      } else if (exitBtn) {
+        exitBtn.style.opacity = '1';
+      }
 
       if (appData.settings.immersive.autoRotate && screen.orientation && screen.orientation.lock) {
         screen.orientation.lock('landscape').catch(() => { });
@@ -13689,6 +14488,24 @@
       focusTimeLeft = focusTotalTime;
       updateFocusTimerDisplay();
       updateFocusProgress();
+
+      // 播放倒计时模式白噪音
+      const focusSettings = appData.settings.immersive.focus || {};
+      if (focusSettings.noiseEnabled) {
+        const noiseType = focusSettings.noiseType || 'ocean';
+        const noiseVolume = (focusSettings.noiseVolume || 30) / 100;
+        createNoiseAudio(noiseType, noiseVolume);
+      }
+
+      // 应用退出按钮隐藏设置
+      const exitBtn = document.getElementById('focus-exit-btn');
+      if (appData.settings.immersive.hideExit && exitBtn) {
+        exitBtn.style.opacity = '0';
+        exitBtn.style.cursor = 'pointer';
+        exitBtn.style.pointerEvents = 'auto';
+      } else if (exitBtn) {
+        exitBtn.style.opacity = '1';
+      }
     }
 
     function updateFocusTimerDisplay() {
@@ -13784,6 +14601,9 @@
       if (settingsPanel) settingsPanel.classList.remove('hidden');
 
       stopFocusTimer();
+      
+      // 停止白噪音
+      stopWhiteNoise();
 
       if (screen.orientation && screen.orientation.unlock) {
         screen.orientation.unlock().catch(() => { });
@@ -13796,6 +14616,7 @@
       const image = document.getElementById('landscape-display-image');
       const timeDisplay = document.getElementById('landscape-display-time');
       const uploadBtn = document.getElementById('landscape-upload-btn');
+      const exitBtn = document.getElementById('landscape-display-exit');
 
       if (appData.settings.landscape.image) {
         image.src = appData.settings.landscape.image;
@@ -13818,11 +14639,36 @@
       // 应用其他设置
       timeDisplay.style.color = appData.settings.landscape.textColor;
       timeDisplay.style.fontSize = appData.settings.landscape.fontSize + 'px';
+      
+      // 应用字体设置
+      if (appData.settings.landscape.font && appData.settings.landscape.font !== 'system' && appData.settings.landscape.font !== 'custom') {
+        timeDisplay.style.fontFamily = appData.settings.landscape.font;
+      } else if (appData.settings.landscape.font === 'custom' && appData.settings.font.custom) {
+        timeDisplay.style.fontFamily = 'CustomFont';
+      } else {
+        timeDisplay.style.fontFamily = '';
+      }
+
+      // 应用退出按钮隐藏设置
+      if (appData.settings.landscape.hideExit && exitBtn) {
+        exitBtn.style.opacity = '0';
+        exitBtn.style.cursor = 'pointer';
+        exitBtn.style.pointerEvents = 'auto';
+      } else if (exitBtn) {
+        exitBtn.style.opacity = '1';
+      }
 
       page.classList.add('active');
 
       updateLandscapeTime();
       landscapeInterval = setInterval(updateLandscapeTime, 1000);
+
+      // 播放白噪音
+      if (appData.settings.landscape.noiseEnabled) {
+        const noiseType = appData.settings.landscape.noiseType || 'ocean';
+        const noiseVolume = (appData.settings.landscape.noiseVolume || 30) / 100;
+        createNoiseAudio(noiseType, noiseVolume);
+      }
 
       if (screen.orientation && screen.orientation.lock) {
         screen.orientation.lock('landscape').catch(() => { });
@@ -13851,6 +14697,9 @@
         clearInterval(landscapeInterval);
         landscapeInterval = null;
       }
+
+      // 停止白噪音
+      stopWhiteNoise();
 
       if (screen.orientation && screen.orientation.unlock) {
         screen.orientation.unlock().catch(() => { });
@@ -14783,6 +15632,7 @@
     let noiseSource = null;
     let noiseGain = null;
     let currentNoiseType = null;
+    let whiteNoiseAudio = null;
     let currentQuoteIndex = 0;
     let usedWallpapers = [];
 
@@ -14966,6 +15816,9 @@
       const weekday = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][now.getDay()];
       
       document.getElementById('daily-date').textContent = `${month}月${day}日 ${weekday}`;
+      
+      // 初始化打卡功能
+      initCheckin();
       
       // 获取新闻
       fetchNews();
@@ -15559,7 +16412,8 @@
       
       noiseVolume.addEventListener('input', function() {
         noiseVolumeValue.textContent = this.value + '%';
-        if (noiseGain) noiseGain.gain.value = this.value / 100;
+        const audio = document.getElementById('whiteNoiseAudio');
+        if (audio) audio.volume = this.value / 100;
       });
       
       stopBtn.addEventListener('click', stopWhiteNoise);
@@ -15582,185 +16436,39 @@
       initWallpaper();
     }
 
-    // 创建白噪音音频 - 每种声音完全不同
+    // 创建白噪音音频 - 使用真实音频文件
     function createNoiseAudio(type, volume) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
+      whiteNoiseAudio = document.getElementById('whiteNoiseAudio');
+      if (!whiteNoiseAudio) return;
       
-      noiseAudioContext = new AudioContext();
+      stopWhiteNoise();
+      
       currentNoiseType = type;
       
-      switch(type) {
-        case 'ocean': {
-          // 海洋：使用低频正弦波模拟海浪，有明显的周期性波动
-          const oscillator1 = noiseAudioContext.createOscillator();
-          const oscillator2 = noiseAudioContext.createOscillator();
-          const lfo = noiseAudioContext.createOscillator(); // LFO控制海浪起伏
-          const lfoGain = noiseAudioContext.createGain();
-          const masterGain = noiseAudioContext.createGain();
-          const filter = noiseAudioContext.createBiquadFilter();
-          
-          oscillator1.type = 'sine';
-          oscillator1.frequency.value = 60;
-          oscillator2.type = 'sine';
-          oscillator2.frequency.value = 120;
-          
-          lfo.type = 'sine';
-          lfo.frequency.value = 0.08; // 很慢的波动，约12秒一个周期
-          lfoGain.gain.value = 30;
-          
-          filter.type = 'lowpass';
-          filter.frequency.value = 200;
-          filter.Q.value = 1;
-          
-          lfo.connect(lfoGain);
-          lfoGain.connect(oscillator1.frequency);
-          lfoGain.connect(oscillator2.frequency);
-          
-          masterGain.gain.value = volume * 0.4;
-          
-          oscillator1.connect(filter);
-          oscillator2.connect(filter);
-          filter.connect(masterGain);
-          masterGain.connect(noiseAudioContext.destination);
-          
-          oscillator1.start();
-          oscillator2.start();
-          lfo.start();
-          
-          noiseSource = { oscillators: [oscillator1, oscillator2, lfo], gain: masterGain };
-          break;
-        }
-        
-        case 'river': {
-          // 河流：使用多个频率的噪声混合，模拟流水声
-          const bufferSize = noiseAudioContext.sampleRate * 2;
-          const buffer = noiseAudioContext.createBuffer(1, bufferSize, noiseAudioContext.sampleRate);
-          const data = buffer.getChannelData(0);
-          
-          for (let i = 0; i < bufferSize; i++) {
-            // 使用粉红噪声 + 低频调制模拟流水
-            const white = Math.random() * 2 - 1;
-            const mod = Math.sin(i * 0.0002) * 0.5 + 0.5;
-            data[i] = white * 0.3 * mod;
-          }
-          
-          const source = noiseAudioContext.createBufferSource();
-          const filter = noiseAudioContext.createBiquadFilter();
-          const gain = noiseAudioContext.createGain();
-          
-          source.buffer = buffer;
-          source.loop = true;
-          filter.type = 'bandpass';
-          filter.frequency.value = 800;
-          filter.Q.value = 0.5;
-          gain.gain.value = volume * 0.6;
-          
-          source.connect(filter);
-          filter.connect(gain);
-          gain.connect(noiseAudioContext.destination);
-          source.start();
-          
-          noiseSource = source;
-          noiseGain = gain;
-          break;
-        }
-        
-        case 'rain': {
-          // 雨声：使用高频颗粒噪声，模拟雨滴落下的声音
-          const bufferSize = noiseAudioContext.sampleRate * 2;
-          const buffer = noiseAudioContext.createBuffer(1, bufferSize, noiseAudioContext.sampleRate);
-          const data = buffer.getChannelData(0);
-          
-          for (let i = 0; i < bufferSize; i++) {
-            // 随机脉冲模拟雨滴
-            if (Math.random() > 0.997) {
-              data[i] = Math.random() * 0.8;
-            } else {
-              data[i] = (Math.random() * 2 - 1) * 0.05;
-            }
-          }
-          
-          const source = noiseAudioContext.createBufferSource();
-          const filter = noiseAudioContext.createBiquadFilter();
-          const gain = noiseAudioContext.createGain();
-          
-          source.buffer = buffer;
-          source.loop = true;
-          filter.type = 'highpass';
-          filter.frequency.value = 2000;
-          gain.gain.value = volume * 0.5;
-          
-          source.connect(filter);
-          filter.connect(gain);
-          gain.connect(noiseAudioContext.destination);
-          source.start();
-          
-          noiseSource = source;
-          noiseGain = gain;
-          break;
-        }
-        
-        case 'night': {
-          // 夜晚：非常安静，只有极低频的声音和偶尔的虫鸣
-          const oscillators = [];
-          const gainNode = noiseAudioContext.createGain();
-          
-          // 极低频的背景音（几乎听不到）
-          const bass = noiseAudioContext.createOscillator();
-          bass.type = 'sine';
-          bass.frequency.value = 30;
-          const bassGain = noiseAudioContext.createGain();
-          bassGain.gain.value = volume * 0.05;
-          bass.connect(bassGain);
-          bassGain.connect(gainNode);
-          oscillators.push(bass);
-          
-          // 偶尔的虫鸣 - 使用调频音效模拟
-          const cricketFreq = noiseAudioContext.createOscillator();
-          cricketFreq.type = 'sine';
-          cricketFreq.frequency.value = 4000;
-          const cricketMod = noiseAudioContext.createOscillator();
-          cricketMod.type = 'sine';
-          cricketMod.frequency.value = 20;
-          const cricketModGain = noiseAudioContext.createGain();
-          cricketModGain.gain.value = 100;
-          cricketMod.connect(cricketModGain);
-          cricketModGain.connect(cricketFreq.frequency);
-          const cricketGain = noiseAudioContext.createGain();
-          cricketGain.gain.value = volume * 0.02;
-          cricketFreq.connect(cricketGain);
-          cricketGain.connect(gainNode);
-          oscillators.push(cricketFreq, cricketMod);
-          
-          gainNode.gain.value = 1;
-          gainNode.connect(noiseAudioContext.destination);
-          
-          oscillators.forEach(o => o.start());
-          
-          noiseSource = { oscillators, gain: gainNode };
-          noiseGain = gainNode;
-          break;
-        }
-      }
+      const soundFiles = {
+        ocean: 'whitesound/Sea.mp3',
+        river: 'whitesound/Forest.mp3',
+        rain: 'whitesound/Rain.mp3',
+        night: 'whitesound/Night.mp3'
+      };
+      
+      whiteNoiseAudio.src = soundFiles[type];
+      whiteNoiseAudio.volume = volume;
+      whiteNoiseAudio.loop = true;
+      whiteNoiseAudio.play().catch(err => {
+        console.error('白噪音播放失败:', err);
+      });
     }
 
     // 停止白噪音
     function stopWhiteNoise() {
-      if (noiseSource) {
-        if (noiseSource.oscillators) {
-          noiseSource.oscillators.forEach(o => {
-            try { o.stop(); } catch(e) {}
-          });
-        } else {
-          try { noiseSource.stop(); } catch(e) {}
-        }
-        noiseSource = null;
+      const audio = document.getElementById('whiteNoiseAudio');
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
       }
-      if (noiseGain) {
-        try { noiseGain.disconnect(); } catch(e) {}
-        noiseGain = null;
-      }
+      noiseSource = null;
+      noiseGain = null;
       if (noiseAudioContext) {
         try { noiseAudioContext.close(); } catch(e) {}
         noiseAudioContext = null;
@@ -15771,7 +16479,31 @@
         i.style.background = 'rgba(255,255,255,0.1)';
         i.style.borderColor = 'rgba(255,255,255,0.1)';
       });
-      document.getElementById('noise-control').style.display = 'none';
+      const control = document.getElementById('noise-control');
+      if (control) control.style.display = 'none';
+    }
+
+    // 白噪音卡片操作函数
+    function toggleWhiteNoiseCard(cardId) {
+      const card = appData.homeCards.find(c => c.id === cardId);
+      if (!card) return;
+      
+      if (currentNoiseType === card.noiseType) {
+        stopWhiteNoise();
+      } else {
+        createNoiseAudio(card.noiseType, 0.3);
+      }
+      renderHomeCards();
+    }
+
+    function selectWhiteNoiseType(cardId, noiseType) {
+      const card = appData.homeCards.find(c => c.id === cardId);
+      if (!card) return;
+      
+      card.noiseType = noiseType;
+      saveData();
+      createNoiseAudio(noiseType, 0.3);
+      renderHomeCards();
     }
 
     /* ================== 个人中心 ================== */
@@ -16176,7 +16908,7 @@
         { title: '个性化定制', icon: '🎨', items: ['ui', 'color', 'font', 'layout', 'bg', 'effect', 'splash'] },
         { title: '功能定制', icon: '⚙️', items: ['password', 'immersive', 'alarm', 'pet', 'water', 'music', 'landscape', 'gesture'] },
         { title: '时间与时区', icon: '🕐', items: ['timezone', 'refresh', 'display', 'festival'] },
-        { title: '更多', icon: '💬', items: ['storage', 'update', 'tips', 'api', 'about'] }
+        { title: '更多', icon: '💬', items: ['more', 'storage', 'update', 'tips', 'api', 'about'] }
       ];
 
       // 搜索模式：扁平列表
@@ -16629,6 +17361,130 @@
     function initFeaturesPage() {
       bindFeatureCardEvents();
       showFeatureTipCard();
+      toggleMoreExtensions();
+    }
+
+    function toggleMoreExtensions() {
+      const moreExtensionsSection = document.getElementById('more-extensions-section');
+      const enabled = appData.settings.moreExtensionsEnabled || false;
+      if (moreExtensionsSection) {
+        moreExtensionsSection.style.display = enabled ? 'block' : 'none';
+      }
+    }
+
+    function openLocalHtmlFile(fileName) {
+      const filePath = fileName;
+      const iframe = document.createElement('iframe');
+      iframe.src = filePath;
+      iframe.style.width = '100%';
+      iframe.style.height = '100vh';
+      iframe.style.border = 'none';
+      
+      const container = document.createElement('div');
+      container.id = 'local-web-view';
+      container.style.position = 'fixed';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.zIndex = '9999';
+      container.style.background = '#000';
+      
+      const backBtn = document.createElement('button');
+      backBtn.textContent = '返回';
+      backBtn.style.position = 'fixed';
+      backBtn.style.top = '20px';
+      backBtn.style.left = '20px';
+      backBtn.style.zIndex = '10000';
+      backBtn.style.background = 'rgba(0,0,0,0.7)';
+      backBtn.style.color = '#fff';
+      backBtn.style.border = 'none';
+      backBtn.style.padding = '10px 20px';
+      backBtn.style.borderRadius = '20px';
+      backBtn.style.cursor = 'pointer';
+      backBtn.style.touchAction = 'none';
+      backBtn.style.userSelect = 'none';
+      
+      let isDragging = false;
+      let hasMoved = false;
+      let startX = 0;
+      let startY = 0;
+      let offsetX = 0;
+      let offsetY = 0;
+      
+      backBtn.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        hasMoved = false;
+        startX = e.clientX;
+        startY = e.clientY;
+        offsetX = e.clientX - backBtn.getBoundingClientRect().left;
+        offsetY = e.clientY - backBtn.getBoundingClientRect().top;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+      
+      backBtn.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        hasMoved = false;
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        offsetX = touch.clientX - backBtn.getBoundingClientRect().left;
+        offsetY = touch.clientY - backBtn.getBoundingClientRect().top;
+        document.addEventListener('touchmove', onTouchMove);
+        document.addEventListener('touchend', onTouchEnd);
+      });
+      
+      function onMouseMove(e) {
+        if (!isDragging) return;
+        const deltaX = Math.abs(e.clientX - startX);
+        const deltaY = Math.abs(e.clientY - startY);
+        if (deltaX > 5 || deltaY > 5) {
+          hasMoved = true;
+        }
+        const x = e.clientX - offsetX;
+        const y = e.clientY - offsetY;
+        backBtn.style.left = Math.max(10, Math.min(window.innerWidth - backBtn.offsetWidth - 10, x)) + 'px';
+        backBtn.style.top = Math.max(10, Math.min(window.innerHeight - backBtn.offsetHeight - 10, y)) + 'px';
+      }
+      
+      function onMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+      
+      function onTouchMove(e) {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const deltaX = Math.abs(touch.clientX - startX);
+        const deltaY = Math.abs(touch.clientY - startY);
+        if (deltaX > 5 || deltaY > 5) {
+          hasMoved = true;
+        }
+        const x = touch.clientX - offsetX;
+        const y = touch.clientY - offsetY;
+        backBtn.style.left = Math.max(10, Math.min(window.innerWidth - backBtn.offsetWidth - 10, x)) + 'px';
+        backBtn.style.top = Math.max(10, Math.min(window.innerHeight - backBtn.offsetHeight - 10, y)) + 'px';
+      }
+      
+      function onTouchEnd() {
+        isDragging = false;
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchend', onTouchEnd);
+      }
+      
+      backBtn.addEventListener('click', () => {
+        if (!hasMoved) {
+          document.body.removeChild(container);
+          document.body.removeChild(backBtn);
+        }
+        hasMoved = false;
+      });
+      
+      container.appendChild(iframe);
+      document.body.appendChild(container);
+      document.body.appendChild(backBtn);
     }
 
     function showFeatureTipCard() {
@@ -16680,6 +17536,26 @@
       // 实用工具卡片
       document.getElementById('feature-tools')?.addEventListener('click', function() {
         switchPage('page-settings');
+      });
+
+      // 扩展功能卡片 - 排班表
+      document.getElementById('feature-aiclass')?.addEventListener('click', function() {
+        openLocalHtmlFile('plushtml/aiclass.html');
+      });
+
+      // 扩展功能卡片 - 笔记卡片
+      document.getElementById('feature-nextpen')?.addEventListener('click', function() {
+        openLocalHtmlFile('plushtml/NextPen1.6.0.html');
+      });
+
+      // 扩展功能卡片 - 部署AI
+      document.getElementById('feature-aichat')?.addEventListener('click', function() {
+        openLocalHtmlFile('plushtml/ai-chat.html');
+      });
+
+      // 扩展功能卡片 - 密码本
+      document.getElementById('feature-keynote')?.addEventListener('click', function() {
+        openLocalHtmlFile('plushtml/keynote.html');
       });
     }
 
@@ -16821,6 +17697,7 @@
           safeSetValue('page-animation-type', appData.settings.ui.pageAnimation || 'fade');
           safeSetValue('page-animation-speed', appData.settings.ui.animationSpeed || 5);
           safeSetChecked('round-watch-toggle', appData.settings.ui.roundWatch || false);
+          safeSetChecked('glass-effect-toggle', appData.settings.ui.glassEffect !== false);
         }
 
         // 初始化主题色
@@ -16846,6 +17723,12 @@
           if (systemFontPreview && appData.settings.font.system && appData.settings.font.system !== 'system') {
             systemFontPreview.style.fontFamily = appData.settings.font.system;
           }
+          // 初始化内置字体
+          safeSetValue('builtin-font-select', appData.settings.font.builtin || '');
+          const builtinFontPreview = document.getElementById('builtin-font-preview');
+          if (builtinFontPreview && appData.settings.font.builtin) {
+            builtinFontPreview.style.fontFamily = appData.settings.font.builtin;
+          }
         }
 
         // 初始化宠物设置
@@ -16866,6 +17749,7 @@
 
         // 初始化沉浸模式设置
         safeSetChecked('immersive-rotate-toggle', appData.settings.immersive ? appData.settings.immersive.autoRotate : true);
+        safeSetChecked('immersive-hide-exit-toggle', appData.settings.immersive ? appData.settings.immersive.hideExit : false);
 
         // 初始化背景设置
         if (appData.settings.background) {
@@ -16917,6 +17801,14 @@
           safeSetChecked('landscape-fullscreen-toggle', appData.settings.landscape.fullscreen);
           safeSetValue('landscape-time-position', appData.settings.landscape.timePosition || 'bottom-right');
           safeSetChecked('landscape-show-date', appData.settings.landscape.showDate !== false);
+          safeSetChecked('landscape-hide-exit-toggle', appData.settings.landscape.hideExit || false);
+          safeSetChecked('landscape-noise-toggle', appData.settings.landscape.noiseEnabled || false);
+          safeSetValue('landscape-noise-select', appData.settings.landscape.noiseType || 'ocean');
+          safeSetValue('landscape-noise-volume', appData.settings.landscape.noiseVolume || 30);
+          safeSetText('landscape-noise-volume-value', (appData.settings.landscape.noiseVolume || 30) + '%');
+          document.getElementById('landscape-noise-panel').style.display = appData.settings.landscape.noiseEnabled ? 'block' : 'none';
+          // 初始化字体选择
+          safeSetValue('landscape-font-select', appData.settings.landscape.font || 'system');
         }
 
         // 初始化密码设置
@@ -16928,8 +17820,15 @@
         // 初始化手势设置
         if (appData.settings.gesture) {
           safeSetChecked('swipe-back-toggle', appData.settings.gesture.swipeBackEnabled || false);
+          safeSetValue('swipe-direction', appData.settings.gesture.swipeDirection || 'right');
           safeSetValue('swipe-range-slider', appData.settings.gesture.swipeRange || 30);
           safeSetText('swipe-range-value', (appData.settings.gesture.swipeRange || 30) + '%');
+          safeSetChecked('swipe-switch-page-toggle', appData.settings.gesture.swipeSwitchPageEnabled || false);
+          safeSetChecked('floating-ball-toggle', appData.settings.gesture.floatingBallEnabled || false);
+          const floatingBall = document.getElementById('floating-ball');
+          if (floatingBall) {
+            floatingBall.style.display = (appData.settings.gesture.floatingBallEnabled) ? 'flex' : 'none';
+          }
         }
         
         // 初始化开发者模式
@@ -16977,6 +17876,9 @@
 
         // 宠物状态更新
         setInterval(renderPet, 60000);
+
+        // 倒计时到期检查
+        setInterval(checkCountdownExpired, 1000);
 
         // 喝水提醒
         setInterval(() => {
@@ -17047,7 +17949,7 @@
           });
         });
 
-        // 右滑返回功能
+        // 滑动返回功能
         let swipeBackStartX = 0;
         let swipeBackStartY = 0;
         let swipeBackStartTime = 0;
@@ -17076,20 +17978,58 @@
           const deltaY = Math.abs(touchEndY - swipeBackStartY);
           const deltaTime = touchEndTime - swipeBackStartTime;
 
-          // 从左边缘向右滑动
-          if (swipeBackStartX < swipeThreshold &&
-              deltaX > 50 &&
-              deltaY < 100 &&
-              deltaTime < 500) {
+          const mainPages = ['page-home', 'page-list', 'page-daily', 'page-settings', 'page-features'];
+          const activePage = document.querySelector('.page.active');
+          const currentPageId = activePage ? activePage.id : '';
+          const isMainPage = mainPages.includes(currentPageId);
+          const swipeSwitchPageEnabled = appData.settings.gesture.swipeSwitchPageEnabled || false;
+
+          // 如果在主页且开启了滑动切换页面功能
+          if (isMainPage && swipeSwitchPageEnabled) {
+            // 左右滑动切换页面
+            if (deltaX > 80 && deltaY < 100 && deltaTime < 500) {
+              // 向右滑动，切换到上一个页面
+              const currentIndex = mainPages.indexOf(currentPageId);
+              if (currentIndex > 0) {
+                switchPage(mainPages[currentIndex - 1]);
+              }
+            } else if (deltaX < -80 && deltaY < 100 && deltaTime < 500) {
+              // 向左滑动，切换到下一个页面
+              const currentIndex = mainPages.indexOf(currentPageId);
+              if (currentIndex < mainPages.length - 1) {
+                switchPage(mainPages[currentIndex + 1]);
+              }
+            }
+            return; // 在主页时不触发返回
+          }
+
+          // 普通滑动返回逻辑
+          const swipeDirection = appData.settings.gesture.swipeDirection || 'right';
+          let shouldSwipeBack = false;
+
+          // 根据滑动方向判断
+          if (swipeDirection === 'right') {
+            // 从左边缘向右滑动
+            shouldSwipeBack = (swipeBackStartX < swipeThreshold &&
+                              deltaX > 50 &&
+                              deltaY < 100 &&
+                              deltaTime < 500);
+          } else {
+            // 从右边缘向左滑动
+            shouldSwipeBack = (swipeBackStartX > screenWidth - swipeThreshold &&
+                              deltaX < -50 &&
+                              deltaY < 100 &&
+                              deltaTime < 500);
+          }
+
+          if (shouldSwipeBack) {
             // 执行返回操作
-            const activePage = document.querySelector('.page.active');
             if (activePage) {
               const backPage = activePage.dataset.back;
               if (backPage) {
                 switchPage(backPage);
               } else {
                 // 如果没有指定返回页面，默认返回首页
-                const currentPageId = activePage.id;
                 if (currentPageId !== 'page-home') {
                   switchPage('page-home');
                 }
@@ -17097,6 +18037,110 @@
             }
           }
         }, { passive: true });
+
+        // 悬浮球功能
+        const floatingBall = document.getElementById('floating-ball');
+        if (floatingBall) {
+          let isDragging = false;
+          let startX, startY;
+          let ballX, ballY;
+          let initialX, initialY;
+
+          // 点击返回
+          floatingBall.addEventListener('click', () => {
+            if (!isDragging) {
+              const activePage = document.querySelector('.page.active');
+              if (activePage) {
+                const backPage = activePage.dataset.back;
+                if (backPage) {
+                  switchPage(backPage);
+                } else {
+                  const currentPageId = activePage.id;
+                  if (currentPageId !== 'page-home') {
+                    switchPage('page-home');
+                  }
+                }
+              }
+            }
+          });
+
+          // 拖动
+          floatingBall.addEventListener('touchstart', (e) => {
+            isDragging = false;
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            const rect = floatingBall.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+          }, { passive: true });
+
+          floatingBall.addEventListener('touchmove', (e) => {
+            if (!appData.settings.gesture || !appData.settings.gesture.floatingBallEnabled) return;
+            isDragging = true;
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - startX;
+            const deltaY = touch.clientY - startY;
+            let newX = initialX + deltaX;
+            let newY = initialY + deltaY;
+            const maxX = window.innerWidth - floatingBall.offsetWidth;
+            const maxY = window.innerHeight - floatingBall.offsetHeight;
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+            floatingBall.style.left = newX + 'px';
+            floatingBall.style.top = newY + 'px';
+            floatingBall.style.bottom = 'auto';
+            floatingBall.style.right = 'auto';
+            if (!appData.settings.gesture) appData.settings.gesture = {};
+            appData.settings.gesture.floatingBallX = newX;
+            appData.settings.gesture.floatingBallY = newY;
+            saveData();
+          }, { passive: true });
+
+          // 鼠标拖动
+          floatingBall.addEventListener('mousedown', (e) => {
+            isDragging = false;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = floatingBall.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+            const onMouseMove = (moveEvent) => {
+              if (!appData.settings.gesture || !appData.settings.gesture.floatingBallEnabled) return;
+              isDragging = true;
+              const deltaX = moveEvent.clientX - startX;
+              const deltaY = moveEvent.clientY - startY;
+              let newX = initialX + deltaX;
+              let newY = initialY + deltaY;
+              const maxX = window.innerWidth - floatingBall.offsetWidth;
+              const maxY = window.innerHeight - floatingBall.offsetHeight;
+              newX = Math.max(0, Math.min(newX, maxX));
+              newY = Math.max(0, Math.min(newY, maxY));
+              floatingBall.style.left = newX + 'px';
+              floatingBall.style.top = newY + 'px';
+              floatingBall.style.bottom = 'auto';
+              floatingBall.style.right = 'auto';
+              if (!appData.settings.gesture) appData.settings.gesture = {};
+              appData.settings.gesture.floatingBallX = newX;
+              appData.settings.gesture.floatingBallY = newY;
+              saveData();
+            };
+            const onMouseUp = () => {
+              document.removeEventListener('mousemove', onMouseMove);
+              document.removeEventListener('mouseup', onMouseUp);
+            };
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+          });
+
+          // 恢复悬浮球位置
+          if (appData.settings.gesture && appData.settings.gesture.floatingBallX !== undefined) {
+            floatingBall.style.left = appData.settings.gesture.floatingBallX + 'px';
+            floatingBall.style.top = appData.settings.gesture.floatingBallY + 'px';
+            floatingBall.style.bottom = 'auto';
+            floatingBall.style.right = 'auto';
+          }
+        }
 
         // 编辑桌面按钮
         const editDesktopBtn = document.getElementById('edit-desktop-btn');
@@ -17139,6 +18183,7 @@
               case 'calendar': openCalendarCardModal(); break;
               case 'shortcut': openShortcutCardModal(); break;
               case 'water': openWaterCardModal(); break;
+              case 'whitenoise': openWhiteNoiseCardModal(); break;
               case 'extension': openExtensionCardModal(); break;
               case 'festival': openFestivalCardModal(); break;
             }
@@ -17514,6 +18559,37 @@
           });
         }
 
+        // 白噪音卡片
+        const saveWhiteNoiseCard = document.getElementById('save-whitenoise-card');
+        if (saveWhiteNoiseCard) {
+          saveWhiteNoiseCard.addEventListener('click', () => {
+            const cardId = document.getElementById('whitenoise-card-id').value;
+            const title = document.getElementById('whitenoise-card-title').value || '白噪音';
+            const noiseType = document.getElementById('whitenoise-card-noise-type').value;
+
+            if (cardId) {
+              const card = appData.homeCards.find(c => c.id === cardId);
+              if (card) {
+                card.title = title;
+                card.noiseType = noiseType;
+              }
+            } else {
+              appData.homeCards.push({ id: generateId(), type: 'whitenoise', title, noiseType });
+            }
+
+            saveData();
+            renderHomeCards();
+            document.getElementById('whitenoise-card-modal').classList.remove('show');
+          });
+        }
+
+        const cancelWhiteNoiseCard = document.getElementById('cancel-whitenoise-card');
+        if (cancelWhiteNoiseCard) {
+          cancelWhiteNoiseCard.addEventListener('click', () => {
+            document.getElementById('whitenoise-card-modal').classList.remove('show');
+          });
+        }
+
         // 扩展卡片
         const extensionCardUploadBtn = document.getElementById('extension-card-upload-btn');
         if (extensionCardUploadBtn) {
@@ -17750,8 +18826,29 @@
         const personalSettingsBtn = document.getElementById('personal-settings-btn');
         if (personalSettingsBtn) {
           personalSettingsBtn.addEventListener('click', () => {
-            document.getElementById('page-personal-settings').classList.add('active');
+            const page = document.getElementById('page-personal-settings');
+            if (page) {
+              page.classList.add('active');
+              initPersonalSettingsPage();
+            }
           });
+        }
+
+        function initPersonalSettingsPage() {
+          if (appData.settings.user) {
+            const filterSelect = document.getElementById('avatar-filter');
+            if (filterSelect && appData.settings.user.avatarFilter) {
+              filterSelect.value = appData.settings.user.avatarFilter;
+            }
+            const bgColorInput = document.getElementById('avatar-bg-color');
+            if (bgColorInput && appData.settings.user.avatarBg) {
+              bgColorInput.value = appData.settings.user.avatarBg;
+            }
+            const personalAvatar = document.getElementById('personal-avatar');
+            if (personalAvatar && appData.settings.user.avatar) {
+              personalAvatar.src = appData.settings.user.avatar;
+            }
+          }
         }
 
         const changeAvatarPersonal = document.getElementById('change-avatar-personal');
@@ -17824,16 +18921,173 @@
           });
         });
 
-        const saveNameColor = document.getElementById('save-name-color');
-        if (saveNameColor) {
-          saveNameColor.addEventListener('click', () => {
-            const activeColor = document.querySelector('.name-color-option.active');
-            const customColor = document.getElementById('custom-name-color').value;
+        const saveNameColorPersonal = document.getElementById('save-name-color-personal');
+        if (saveNameColorPersonal) {
+          saveNameColorPersonal.addEventListener('click', () => {
+            const activeColor = document.querySelector('#name-color-preset-personal .name-color-option.active');
+            const customColor = document.getElementById('custom-name-color-personal').value;
             appData.settings.user.nameColor = activeColor ? activeColor.dataset.color : customColor;
             saveData();
             renderUserInfo();
-            document.getElementById('page-name-color').classList.remove('active');
           });
+        }
+
+        document.querySelectorAll('#name-color-preset-personal .name-color-option').forEach(opt => {
+          opt.addEventListener('click', () => {
+            document.querySelectorAll('#name-color-preset-personal .name-color-option').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+            const userName = document.getElementById('user-name');
+            if (userName) userName.style.color = opt.dataset.color;
+          });
+        });
+
+        const checkinBtn = document.getElementById('checkin-btn');
+        if (checkinBtn) {
+          checkinBtn.addEventListener('click', checkin);
+        }
+
+        const avatarPresetOptions = document.querySelectorAll('.avatar-preset-option');
+        avatarPresetOptions.forEach(opt => {
+          opt.addEventListener('click', () => {
+            const emoji = opt.dataset.avatar;
+            const style = opt.getAttribute('style');
+            const bgMatch = style.match(/background:\s*([^;]+)/);
+            const bgColor = bgMatch ? bgMatch[1] : '#4ecdc4';
+            createAvatarFromEmoji(emoji, bgColor);
+          });
+        });
+
+        const saveEmojiAvatar = document.getElementById('save-emoji-avatar');
+        if (saveEmojiAvatar) {
+          saveEmojiAvatar.addEventListener('click', () => {
+            const emoji = document.getElementById('emoji-avatar-input').value;
+            if (emoji) {
+              const bgColor = document.getElementById('avatar-bg-color').value || '#4ecdc4';
+              createAvatarFromEmoji(emoji, bgColor);
+            }
+          });
+        }
+
+        const saveTextAvatar = document.getElementById('save-text-avatar');
+        if (saveTextAvatar) {
+          saveTextAvatar.addEventListener('click', () => {
+            const text = document.getElementById('text-avatar-input').value;
+            if (text) {
+              const bgColor = document.getElementById('avatar-bg-color').value || '#4ecdc4';
+              createAvatarFromText(text, bgColor);
+            }
+          });
+        }
+
+        const saveAvatarBg = document.getElementById('save-avatar-bg');
+        if (saveAvatarBg) {
+          saveAvatarBg.addEventListener('click', () => {
+            const bgColor = document.getElementById('avatar-bg-color').value;
+            if (appData.settings.user) {
+              appData.settings.user.avatarBg = bgColor;
+              saveData();
+              if (appData.settings.user.avatarType === 'emoji' || appData.settings.user.avatarType === 'text') {
+                refreshAvatar();
+              }
+            }
+          });
+        }
+
+        const saveAvatarFilter = document.getElementById('save-avatar-filter');
+        if (saveAvatarFilter) {
+          saveAvatarFilter.addEventListener('click', () => {
+            const filter = document.getElementById('avatar-filter').value;
+            if (appData.settings.user) {
+              appData.settings.user.avatarFilter = filter;
+              saveData();
+              refreshAvatar();
+            }
+          });
+        }
+
+        function createAvatarFromEmoji(emoji, bgColor) {
+          const canvas = document.createElement('canvas');
+          canvas.width = 100;
+          canvas.height = 100;
+          const ctx = canvas.getContext('2d');
+          
+          ctx.beginPath();
+          ctx.arc(50, 50, 48, 0, Math.PI * 2);
+          ctx.fillStyle = bgColor;
+          ctx.fill();
+          
+          ctx.font = '40px serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const x = canvas.width / 2;
+          const y = canvas.height / 2;
+          ctx.fillText(emoji, x, y);
+          
+          const dataUrl = canvas.toDataURL('image/png');
+          
+          if (appData.settings.user) {
+            appData.settings.user.avatar = dataUrl;
+            appData.settings.user.avatarType = 'emoji';
+            appData.settings.user.avatarBg = bgColor;
+            appData.settings.user.avatarContent = emoji;
+            saveData();
+            refreshAvatar();
+          }
+        }
+
+        function createAvatarFromText(text, bgColor) {
+          const canvas = document.createElement('canvas');
+          canvas.width = 100;
+          canvas.height = 100;
+          const ctx = canvas.getContext('2d');
+          
+          ctx.beginPath();
+          ctx.arc(50, 50, 48, 0, Math.PI * 2);
+          ctx.fillStyle = bgColor;
+          ctx.fill();
+          
+          ctx.font = 'bold 36px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#fff';
+          const x = canvas.width / 2;
+          const y = canvas.height / 2;
+          ctx.fillText(text, x, y);
+          
+          const dataUrl = canvas.toDataURL('image/png');
+          
+          if (appData.settings.user) {
+            appData.settings.user.avatar = dataUrl;
+            appData.settings.user.avatarType = 'text';
+            appData.settings.user.avatarBg = bgColor;
+            appData.settings.user.avatarContent = text;
+            saveData();
+            refreshAvatar();
+          }
+        }
+
+        function refreshAvatar() {
+          const avatarImgs = document.querySelectorAll('.user-avatar');
+          avatarImgs.forEach(img => {
+            if (appData.settings.user && appData.settings.user.avatar) {
+              img.src = appData.settings.user.avatar;
+            } else {
+              img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="45" fill="%23ccc"/%3E%3Ctext x="50" y="55" text-anchor="middle" font-size="40" fill="%23666"%3E👤%3C/text%3E%3C/svg%3E';
+            }
+            if (appData.settings.user?.avatarFilter && appData.settings.user.avatarFilter !== 'none') {
+              const filters = {
+                grayscale: 'grayscale(100%)',
+                sepia: 'sepia(100%)',
+                brightness: 'brightness(150%)',
+                contrast: 'contrast(150%)',
+                saturate: 'saturate(200%)'
+              };
+              img.style.filter = filters[appData.settings.user.avatarFilter] || '';
+            } else {
+              img.style.filter = '';
+            }
+          });
+          renderUserInfo();
         }
 
         // 颜文字宠物
@@ -18094,6 +19348,13 @@
               appData.settings.ui.blurIntensity = blurIntensitySlider.value;
             }
 
+            const glassEffectToggle = document.getElementById('glass-effect-toggle');
+            if (glassEffectToggle) {
+              if (!appData.settings.ui) appData.settings.ui = {};
+              appData.settings.ui.glassEffect = glassEffectToggle.checked;
+              applyGlassEffect(glassEffectToggle.checked);
+            }
+
             if (!appData.settings.layout) appData.settings.layout = {};
             appData.settings.layout.newCountdownUI = newCountdownUICheckbox ? newCountdownUICheckbox.checked : false;
             appData.settings.layout.countdownColumns = countdownColumnsSelect ? parseInt(countdownColumnsSelect.value) : 1;
@@ -18223,6 +19484,20 @@
             appData.settings.font.system = e.target.value;
             if (systemFontPreview) {
               systemFontPreview.style.fontFamily = e.target.value === 'system' ? 'inherit' : e.target.value;
+            }
+            updateCSSVariables();
+          });
+        }
+
+        // 内置字体选择
+        const builtinFontSelect = document.getElementById('builtin-font-select');
+        const builtinFontPreview = document.getElementById('builtin-font-preview');
+        if (builtinFontSelect) {
+          builtinFontSelect.addEventListener('change', (e) => {
+            if (!appData.settings.font) appData.settings.font = {};
+            appData.settings.font.builtin = e.target.value;
+            if (builtinFontPreview && e.target.value) {
+              builtinFontPreview.style.fontFamily = e.target.value;
             }
             updateCSSVariables();
           });
@@ -18432,6 +19707,70 @@
           });
         }
 
+        // 模块模式白噪音设置
+        const immersiveModulesNoiseToggle = document.getElementById('immersive-modules-noise-toggle');
+        if (immersiveModulesNoiseToggle) {
+          immersiveModulesNoiseToggle.addEventListener('change', (e) => {
+            if (!appData.settings.immersive) appData.settings.immersive = {};
+            if (!appData.settings.immersive.modules) appData.settings.immersive.modules = {};
+            appData.settings.immersive.modules.noiseEnabled = e.target.checked;
+            document.getElementById('immersive-modules-noise-panel').style.display = e.target.checked ? 'block' : 'none';
+          });
+        }
+
+        const immersiveModulesNoiseSelect = document.getElementById('immersive-modules-noise-select');
+        if (immersiveModulesNoiseSelect) {
+          immersiveModulesNoiseSelect.addEventListener('change', (e) => {
+            if (!appData.settings.immersive) appData.settings.immersive = {};
+            if (!appData.settings.immersive.modules) appData.settings.immersive.modules = {};
+            appData.settings.immersive.modules.noiseType = e.target.value;
+          });
+        }
+
+        const immersiveModulesNoiseVolume = document.getElementById('immersive-modules-noise-volume');
+        if (immersiveModulesNoiseVolume) {
+          immersiveModulesNoiseVolume.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (!appData.settings.immersive) appData.settings.immersive = {};
+            if (!appData.settings.immersive.modules) appData.settings.immersive.modules = {};
+            appData.settings.immersive.modules.noiseVolume = value;
+            const valueEl = document.getElementById('immersive-modules-noise-volume-value');
+            if (valueEl) valueEl.textContent = value + '%';
+          });
+        }
+
+        // 倒计时模式白噪音设置
+        const immersiveFocusNoiseToggle = document.getElementById('immersive-focus-noise-toggle');
+        if (immersiveFocusNoiseToggle) {
+          immersiveFocusNoiseToggle.addEventListener('change', (e) => {
+            if (!appData.settings.immersive) appData.settings.immersive = {};
+            if (!appData.settings.immersive.focus) appData.settings.immersive.focus = {};
+            appData.settings.immersive.focus.noiseEnabled = e.target.checked;
+            document.getElementById('immersive-focus-noise-panel').style.display = e.target.checked ? 'block' : 'none';
+          });
+        }
+
+        const immersiveFocusNoiseSelect = document.getElementById('immersive-focus-noise-select');
+        if (immersiveFocusNoiseSelect) {
+          immersiveFocusNoiseSelect.addEventListener('change', (e) => {
+            if (!appData.settings.immersive) appData.settings.immersive = {};
+            if (!appData.settings.immersive.focus) appData.settings.immersive.focus = {};
+            appData.settings.immersive.focus.noiseType = e.target.value;
+          });
+        }
+
+        const immersiveFocusNoiseVolume = document.getElementById('immersive-focus-noise-volume');
+        if (immersiveFocusNoiseVolume) {
+          immersiveFocusNoiseVolume.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (!appData.settings.immersive) appData.settings.immersive = {};
+            if (!appData.settings.immersive.focus) appData.settings.immersive.focus = {};
+            appData.settings.immersive.focus.noiseVolume = value;
+            const valueEl = document.getElementById('immersive-focus-noise-volume-value');
+            if (valueEl) valueEl.textContent = value + '%';
+          });
+        }
+
         const immersiveWallpaperType = document.getElementById('immersive-wallpaper-type');
         if (immersiveWallpaperType) {
           immersiveWallpaperType.addEventListener('change', (e) => {
@@ -18613,6 +19952,17 @@
           extensionMenu.addEventListener('click', () => {
             document.getElementById('page-extension').classList.add('active');
             renderExtensionSlots();
+          });
+        }
+
+        // 更多扩展功能开关
+        const moreExtensionsToggle = document.getElementById('more-extensions-toggle');
+        if (moreExtensionsToggle) {
+          moreExtensionsToggle.checked = appData.settings.moreExtensionsEnabled || false;
+          moreExtensionsToggle.addEventListener('change', (e) => {
+            appData.settings.moreExtensionsEnabled = e.target.checked;
+            saveData();
+            toggleMoreExtensions();
           });
         }
 
@@ -19200,6 +20550,46 @@ Error: ${e.message}`;
           }
         }
 
+        // iOS预设壁纸点击事件
+        const iosWallpaperOptions = document.querySelectorAll('.wallpaper-option');
+        console.log('🔍 找到的iOS壁纸选项数量:', iosWallpaperOptions.length);
+        
+        iosWallpaperOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            const wallpaperFileName = option.dataset.wallpaper;
+            console.log('🖼️ 点击了壁纸:', wallpaperFileName);
+            
+            // 清除所有选中状态
+            iosWallpaperOptions.forEach(opt => {
+              opt.style.borderColor = 'transparent';
+            });
+            
+            // 设置当前选中状态
+            option.style.borderColor = 'var(--theme-color)';
+            
+            // 直接应用背景（使用文件路径）
+            alert('应用iOS预设壁纸（刷新后需要重新选择）');
+            
+            if (!appData.settings.background) appData.settings.background = {};
+            appData.settings.background.type = 'image';
+            appData.settings.background.image = wallpaperFileName;
+            
+            const thumb = document.getElementById('bg-thumb');
+            if (thumb) {
+              thumb.src = wallpaperFileName;
+              thumb.style.display = 'block';
+            }
+            
+            // 直接修改背景样式，不依赖localStorage
+            document.body.style.backgroundImage = 'url("' + wallpaperFileName + '")';
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundRepeat = 'no-repeat';
+            
+            saveData();
+          });
+        });
+
 
         const blurToggle = document.getElementById('blur-toggle');
         if (blurToggle) {
@@ -19495,11 +20885,47 @@ Error: ${e.message}`;
           });
         }
 
+        // 预设铃声选择
+        const presetRadios = document.querySelectorAll('input[name="alarm-preset"]');
+        presetRadios.forEach(radio => {
+          radio.addEventListener('change', (e) => {
+            if (e.target.checked) {
+              if (!appData.settings.alarm) appData.settings.alarm = {};
+              appData.settings.alarm.sound = e.target.value;
+              
+              // 更新铃声文件名显示
+              const fileName = document.getElementById('alarm-file-name');
+              if (fileName) {
+                fileName.textContent = e.target.value.replace('tipsound/', '');
+              }
+            }
+          });
+        });
+
+        // 预设铃声预览按钮
+        const presetPlayButtons = document.querySelectorAll('.alarm-sound-play');
+        presetPlayButtons.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const soundPath = btn.dataset.sound;
+            const alarmSound = document.getElementById('alarmSound');
+            alarmSound.src = soundPath;
+            alarmSound.volume = (appData.settings.alarm?.volume || 80) / 100;
+            alarmSound.play().catch(() => { });
+          });
+        });
+
+        // 初始化预设铃声选中状态
+        const currentSound = appData.settings.alarm?.sound || 'tipsound/Cloudscape.ogg';
+        const activePreset = document.querySelector(`input[name="alarm-preset"][value="${currentSound}"]`);
+        if (activePreset) {
+          activePreset.checked = true;
+        }
+
         const testAlarmBtn = document.getElementById('test-alarm-btn');
         if (testAlarmBtn) {
           testAlarmBtn.addEventListener('click', () => {
             playAlarm();
-            setTimeout(stopAlarm, 3000);
           });
         }
 
@@ -19651,6 +21077,39 @@ Error: ${e.message}`;
           });
         }
 
+        const landscapeNoiseToggle = document.getElementById('landscape-noise-toggle');
+        if (landscapeNoiseToggle) {
+          landscapeNoiseToggle.addEventListener('change', (e) => {
+            if (!appData.settings.landscape) appData.settings.landscape = {};
+            appData.settings.landscape.noiseEnabled = e.target.checked;
+            document.getElementById('landscape-noise-panel').style.display = e.target.checked ? 'block' : 'none';
+            saveData();
+          });
+        }
+
+        const landscapeNoiseSelect = document.getElementById('landscape-noise-select');
+        if (landscapeNoiseSelect) {
+          landscapeNoiseSelect.addEventListener('change', (e) => {
+            if (!appData.settings.landscape) appData.settings.landscape = {};
+            appData.settings.landscape.noiseType = e.target.value;
+            saveData();
+          });
+        }
+
+        const landscapeNoiseVolume = document.getElementById('landscape-noise-volume');
+        if (landscapeNoiseVolume) {
+          landscapeNoiseVolume.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (!appData.settings.landscape) appData.settings.landscape = {};
+            appData.settings.landscape.noiseVolume = value;
+            const valueEl = document.getElementById('landscape-noise-volume-value');
+            if (valueEl) valueEl.textContent = value + '%';
+          });
+          landscapeNoiseVolume.addEventListener('change', () => {
+            saveData();
+          });
+        }
+
         const saveLandscapeSettings = document.getElementById('save-landscape-settings');
         if (saveLandscapeSettings) {
           saveLandscapeSettings.addEventListener('click', () => {
@@ -19670,6 +21129,24 @@ Error: ${e.message}`;
           });
         }
 
+        const swipeDirection = document.getElementById('swipe-direction');
+        if (swipeDirection) {
+          swipeDirection.addEventListener('change', (e) => {
+            if (!appData.settings.gesture) appData.settings.gesture = {};
+            appData.settings.gesture.swipeDirection = e.target.value;
+            saveData();
+          });
+        }
+
+        const swipeSwitchPageToggle = document.getElementById('swipe-switch-page-toggle');
+        if (swipeSwitchPageToggle) {
+          swipeSwitchPageToggle.addEventListener('change', (e) => {
+            if (!appData.settings.gesture) appData.settings.gesture = {};
+            appData.settings.gesture.swipeSwitchPageEnabled = e.target.checked;
+            saveData();
+          });
+        }
+
         const swipeRangeSlider = document.getElementById('swipe-range-slider');
         if (swipeRangeSlider) {
           swipeRangeSlider.addEventListener('input', (e) => {
@@ -19684,12 +21161,45 @@ Error: ${e.message}`;
           });
         }
 
+        const floatingBallToggle = document.getElementById('floating-ball-toggle');
+        if (floatingBallToggle) {
+          floatingBallToggle.addEventListener('change', (e) => {
+            if (!appData.settings.gesture) appData.settings.gesture = {};
+            appData.settings.gesture.floatingBallEnabled = e.target.checked;
+            const floatingBall = document.getElementById('floating-ball');
+            if (floatingBall) {
+              floatingBall.style.display = e.target.checked ? 'flex' : 'none';
+            }
+            saveData();
+          });
+        }
+
         const saveGestureSettings = document.getElementById('save-gesture-settings');
         if (saveGestureSettings) {
           saveGestureSettings.addEventListener('click', () => {
             saveData();
             document.getElementById('page-settings-gesture').classList.remove('active');
             alert('手势设置已保存');
+          });
+        }
+
+        // 横屏展示隐藏退出按钮
+        const landscapeHideExitToggle = document.getElementById('landscape-hide-exit-toggle');
+        if (landscapeHideExitToggle) {
+          landscapeHideExitToggle.addEventListener('change', (e) => {
+            if (!appData.settings.landscape) appData.settings.landscape = {};
+            appData.settings.landscape.hideExit = e.target.checked;
+            saveData();
+          });
+        }
+
+        // 沉浸模式隐藏退出按钮
+        const immersiveHideExitToggle = document.getElementById('immersive-hide-exit-toggle');
+        if (immersiveHideExitToggle) {
+          immersiveHideExitToggle.addEventListener('change', (e) => {
+            if (!appData.settings.immersive) appData.settings.immersive = {};
+            appData.settings.immersive.hideExit = e.target.checked;
+            saveData();
           });
         }
 
@@ -19806,6 +21316,12 @@ Error: ${e.message}`;
             }
           });
         });
+
+        // 倒计时结束弹窗关闭按钮
+        const closeCountdownExpiredBtn = document.getElementById('close-countdown-expired');
+        if (closeCountdownExpiredBtn) {
+          closeCountdownExpiredBtn.addEventListener('click', closeCountdownExpiredModal);
+        }
 
         console.log('事件绑定完成');
       } catch (error) {
