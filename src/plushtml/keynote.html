@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密码本</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.dark-mode::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="15" fill="rgba(255,255,255,0.02)"/><circle cx="80" cy="60" r="25" fill="rgba(255,255,255,0.015)"/><circle cx="40" cy="80" r="10" fill="rgba(255,255,255,0.02)"/></svg>');
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="15" fill="rgba(255,255,255,0.05)"/><circle cx="80" cy="60" r="25" fill="rgba(255,255,255,0.03)"/><circle cx="40" cy="80" r="10" fill="rgba(255,255,255,0.04)"/></svg>');
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 2.5em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .add-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .password-list {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .password-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        body.dark-mode .password-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .password-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .app-name {
+            color: #fff;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        img.app-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(255,100,100,0.4);
+        }
+
+        .card-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .field {
+            background: rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 12px 15px;
+        }
+
+        .field-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .field-value {
+            color: #fff;
+            font-size: 1em;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-dots {
+            cursor: pointer;
+            letter-spacing: 2px;
+        }
+
+        .history-section {
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .history-toggle {
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: color 0.3s;
+        }
+
+        .history-toggle:hover {
+            color: #fff;
+        }
+
+        .history-list {
+            margin-top: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-list.show {
+            display: flex;
+        }
+
+        .history-item {
+            background: rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .history-item .date {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8em;
+            margin-bottom: 3px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay {
+            animation: fadeOut 0.3s ease;
+        }
+
+        .modal {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            padding: 35px;
+            width: 100%;
+            animation: modalSlide 0.3s ease;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlide 0.3s ease;
+        }
+
+        body.dark-mode .modal {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal h2 {
+            color: #fff;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.6em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .modal-btn.cancel:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-btn.save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .modal-btn.save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.2em;
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1em;
+            z-index: 2000;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .copy-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1em;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .icon-upload-group {
+            margin-bottom: 20px;
+        }
+
+        .icon-upload-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .icon-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .icon-placeholder {
+            font-size: 1.5em;
+        }
+
+        .icon-input-hidden {
+            display: none;
+        }
+
+        .icon-upload-btn, .icon-remove-btn {
+            padding: 8px 14px;
+            background: rgba(102,126,234,0.3);
+            border: 1px solid rgba(102,126,234,0.4);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .icon-upload-btn:hover, .icon-remove-btn:hover {
+            background: rgba(102,126,234,0.5);
+        }
+
+        .icon-remove-btn {
+            background: rgba(255,100,100,0.3);
+            border-color: rgba(255,100,100,0.4);
+        }
+
+        .icon-remove-btn:hover {
+            background: rgba(255,100,100,0.5);
+        }
+
+        .round-screen-icon-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .round-screen-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .round-screen-icon-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .round-screen-icon-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .round-screen-icon-btn {
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .round-screen-icon-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            z-index: 100;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .settings-panel.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-panel {
+            animation: fadeOut 0.3s ease;
+        }
+
+        .settings-content {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+
+        body.dark-mode .settings-content {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .settings-title {
+            color: #fff;
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .settings-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+
+        .settings-close:hover {
+            color: #fff;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 15px;
+            margin-bottom: 12px;
+        }
+
+        body.dark-mode .setting-item {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .setting-label {
+            color: #fff;
+            font-size: 1em;
+        }
+
+        .theme-color-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-picker-wrapper input[type="color"]:hover {
+            transform: scale(1.1);
+        }
+
+        .lock-type-item {
+            display: none;
+        }
+
+        .reset-lock-btn {
+            padding: 10px 20px;
+            background: rgba(102,126,234,0.5);
+            border: 1px solid rgba(102,126,234,0.6);
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reset-lock-btn:hover {
+            background: rgba(102,126,234,0.7);
+        }
+
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        body.dark-mode .lock-screen {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.round-screen-active .lock-screen {
+            width: min(360px, 90vw, 90vh);
+            height: min(360px, 90vw, 90vh);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        body.dark-mode.round-screen-active .lock-screen {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            box-shadow: 0 0 60px rgba(0,0,0,0.5),
+                        inset 0 0 30px rgba(255,255,255,0.05);
+        }
+
+        body.round-screen-active .lock-screen {
+            box-shadow: 0 0 60px rgba(102,126,234,0.5),
+                        inset 0 0 30px rgba(255,255,255,0.1);
+        }
+
+        body.round-screen-active .lock-screen h2 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+        }
+
+        body.round-screen-active .lock-screen .lock-input {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        body.round-screen-active .lock-screen .number-pad {
+            gap: 10px;
+        }
+
+        body.round-screen-active .lock-screen .number-btn {
+            width: 55px;
+            height: 55px;
+            font-size: 1.2em;
+        }
+
+        @media (orientation: landscape) {
+            .lock-screen {
+                flex-direction: row;
+                gap: 50px;
+            }
+            .lock-screen .number-pad {
+                gap: 10px;
+            }
+            .lock-screen .number-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.2em;
+            }
+        }
+
+        .lock-screen h2 {
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .number-btn {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .number-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .number-btn.delete {
+            background: rgba(255,100,100,0.3);
+        }
+
+        .number-btn.delete:hover {
+            background: rgba(255,100,100,0.5);
+        }
+
+        .lock-input {
+            font-size: 1.5em;
+            letter-spacing: 10px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .lock-error {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .zoom-setting {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(102,126,234,0.4);
+            border: 1px solid rgba(102,126,234,0.5);
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(102,126,234,0.6);
+            transform: scale(1.1);
+        }
+
+        .zoom-value {
+            color: #fff;
+            font-size: 1em;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.3);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .round-screen-mode {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(360px, 90vw, 90vh);
+            height: min(360px, 90vw, 90vh);
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102,126,234,0.9) 0%, rgba(118,75,162,0.9) 100%);
+            box-shadow: 0 0 60px rgba(102,126,234,0.5),
+                        inset 0 0 30px rgba(255,255,255,0.1);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+
+        body.dark-mode .round-screen-mode {
+            background: linear-gradient(135deg, rgba(26,26,46,0.98) 0%, rgba(22,33,62,0.98) 100%);
+            box-shadow: 0 0 60px rgba(0,0,0,0.5),
+                        inset 0 0 30px rgba(255,255,255,0.05);
+        }
+
+        .round-screen-mode.show {
+            display: flex;
+        }
+
+        .round-screen-header {
+            padding: 15px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .round-screen-header h1 {
+            color: #fff;
+            font-size: 1.2em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .round-screen-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .round-screen-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .round-screen-body::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        .round-screen-body::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.4);
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+
+        .round-screen-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.6);
+        }
+
+        .round-screen-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .round-screen-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .round-screen-card-title {
+            color: #fff;
+            font-size: 1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .round-screen-card-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .round-screen-search-box {
+            padding: 0 15px 10px;
+        }
+
+        .round-screen-search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 0.85em;
+            box-sizing: border-box;
+        }
+
+        .round-screen-search-box input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .round-screen-card-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .round-screen-action-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+        }
+
+        .round-screen-action-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .round-screen-action-btn.delete:hover {
+            background: rgba(255,100,100,0.4);
+        }
+
+        .round-screen-field {
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+        }
+
+        .round-screen-field-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75em;
+            margin-bottom: 3px;
+        }
+
+        .round-screen-field-value {
+            color: #fff;
+            font-size: 0.9em;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .round-screen-copy-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .round-screen-copy-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .round-screen-add-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.2);
+            border: 1px dashed rgba(255,255,255,0.4);
+            border-radius: 15px;
+            color: #fff;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .round-screen-add-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .round-screen-empty {
+            text-align: center;
+            padding: 30px 10px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .round-screen-empty-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .round-screen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .round-screen-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .round-screen-modal {
+            animation: fadeOut 0.3s ease;
+        }
+
+        .round-screen-modal-content {
+            background: linear-gradient(135deg, rgba(102,126,234,0.98) 0%, rgba(118,75,162,0.98) 100%);
+            border-radius: 50%;
+            padding: 20px;
+            width: min(300px, 80vw, 80vh);
+            height: min(300px, 80vw, 80vh);
+            aspect-ratio: 1 / 1;
+            max-height: 320px;
+            animation: roundModalSlide 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0,0,0,0.3),
+                        inset 0 0 20px rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode.round-screen-active .round-screen-modal-content {
+            background: linear-gradient(135deg, rgba(26,26,46,0.98) 0%, rgba(22,33,62,0.98) 100%);
+        }
+
+        .round-screen-modal-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .round-screen-modal-content::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.08);
+            border-radius: 2px;
+        }
+
+        .round-screen-modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.35);
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .round-screen-modal-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .round-screen-modal h2 {
+            color: #fff;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+
+        .round-screen-form-group {
+            margin-bottom: 10px;
+        }
+
+        .round-screen-form-group label {
+            display: block;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 4px;
+            font-size: 0.8em;
+        }
+
+        .round-screen-form-group input,
+        .round-screen-form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9em;
+        }
+
+        .round-screen-form-group input::placeholder,
+        .round-screen-form-group textarea::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .round-screen-form-group input:focus,
+        .round-screen-form-group textarea:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.2);
+        }
+
+        body.dark-mode.round-screen-active .round-screen-form-group input,
+        body.dark-mode.round-screen-active .round-screen-form-group textarea {
+            background: rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        body.dark-mode.round-screen-active .round-screen-form-group input:focus,
+        body.dark-mode.round-screen-active .round-screen-form-group textarea:focus {
+            background: rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .round-screen-form-group textarea {
+            resize: none;
+            min-height: 50px;
+        }
+
+        .round-screen-modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .round-screen-modal-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .round-screen-modal-btn.cancel {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+        .round-screen-modal-btn.save {
+            background: #fff;
+            color: #764ba2;
+        }
+
+        .round-screen-modal-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .round-screen-modal-btn:active {
+            transform: scale(0.98);
+        }
+
+        body.dark-mode.round-screen-active .round-screen-modal-btn.cancel {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+
+        body.dark-mode.round-screen-active .round-screen-modal-btn.save {
+            background: rgba(255,255,255,0.9);
+            color: #1a1a2e;
+        }
+
+        .round-screen-settings-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            margin-top: 8px;
+        }
+
+        .round-screen-settings-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .round-screen-toast {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .round-screen-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        body.round-screen-active .settings-btn {
+            display: none !important;
+        }
+
+        body.round-screen-active .settings-panel.show {
+            background: rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s ease;
+        }
+
+        body.round-screen-active .settings-panel {
+            animation: fadeOut 0.3s ease;
+        }
+
+        body.round-screen-active .settings-content {
+            border-radius: 50%;
+            width: min(260px, 75vw, 75vh);
+            height: min(260px, 75vw, 75vh);
+            max-height: min(260px, 75vw, 75vh);
+            max-width: min(260px, 75vw, 75vh);
+            aspect-ratio: 1 / 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, rgba(102,126,234,0.95) 0%, rgba(118,75,162,0.95) 100%);
+            box-shadow: 0 0 40px rgba(0,0,0,0.4);
+            animation: roundModalSlide 0.3s ease;
+        }
+
+        body.dark-mode.round-screen-active .settings-content {
+            background: linear-gradient(135deg, rgba(26,26,46,0.98) 0%, rgba(22,33,62,0.98) 100%);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes roundModalSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        body.round-screen-active .settings-title {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        body.round-screen-active .setting-item {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+        }
+
+        body.dark-mode.round-screen-active .setting-item {
+            background: rgba(255,255,255,0.1);
+        }
+
+        body.round-screen-active .setting-label {
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1>🔐 密码本</h1>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索应用名称..." oninput="filterPasswords()">
+        </div>
+
+        <div class="password-list" id="passwordList"></div>
+
+        <button class="add-btn" onclick="openModal()">+ 添加密码</button>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel" onclick="closeSettingsOnOverlay(event)">
+        <div class="settings-content">
+            <div class="settings-title">
+                <span></span>
+                <span>设置</span>
+                <button class="settings-close" onclick="closeSettings()">×</button>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">圆屏手表模式</span>
+                <label class="switch">
+                    <input type="checkbox" id="roundScreenToggle" onchange="toggleRoundScreen()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">深色模式</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item theme-color-item">
+                <span class="setting-label">自定义主题色</span>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="primaryColorPicker" value="#667eea" onchange="applyThemeColor()">
+                    <input type="color" id="secondaryColorPicker" value="#764ba2" onchange="applyThemeColor()">
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">密码锁</span>
+                <label class="switch">
+                    <input type="checkbox" id="lockToggle" onchange="toggleLock()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <button class="reset-lock-btn" onclick="openSetLockModal()">设置数字密码</button>
+            </div>
+            <div class="setting-item zoom-setting">
+                <span class="setting-label">页面缩放</span>
+                <div class="zoom-control">
+                    <button class="zoom-btn" onclick="adjustZoom(-10)">-</button>
+                    <span class="zoom-value" id="zoomValue">100%</span>
+                    <button class="zoom-btn" onclick="adjustZoom(10)">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="round-screen-mode" id="roundScreenMode">
+        <div class="round-screen-header">
+            <h1>🔐 密码本</h1>
+            <button class="round-screen-settings-btn" onclick="openSettings()">⚙️</button>
+        </div>
+        <div class="round-screen-search-box">
+            <input type="text" id="roundScreenSearchInput" placeholder="搜索..." oninput="filterRoundScreenPasswords()">
+        </div>
+        <div class="round-screen-body" id="roundScreenList"></div>
+        <button class="round-screen-add-btn" onclick="openRoundScreenModal()">+ 添加</button>
+        <div class="round-screen-toast" id="roundScreenToast"></div>
+    </div>
+
+    <div class="round-screen-modal" id="roundScreenModal" onclick="closeRoundScreenModalOnOverlay(event)">
+        <div class="round-screen-modal-content">
+            <h2 id="roundScreenModalTitle">添加密码</h2>
+            <form id="roundScreenForm" onsubmit="saveRoundScreenPassword(event)">
+                <input type="hidden" id="roundScreenEditId">
+                <div class="round-screen-form-group round-screen-icon-group">
+                    <label>图标</label>
+                    <div class="round-screen-icon-wrapper">
+                        <div class="round-screen-icon-preview" id="roundScreenIconPreview">
+                            <span class="icon-placeholder">📱</span>
+                        </div>
+                        <input type="file" id="roundScreenIconInput" accept="image/*" class="icon-input-hidden" onchange="previewRoundScreenIcon(this)">
+                        <button type="button" class="round-screen-icon-btn" onclick="document.getElementById('roundScreenIconInput').click()">上传</button>
+                    </div>
+                </div>
+                <div class="round-screen-form-group">
+                    <label>应用名称 *</label>
+                    <input type="text" id="roundScreenAppName" placeholder="例如：微信" required>
+                </div>
+                <div class="round-screen-form-group">
+                    <label>账号</label>
+                    <input type="text" id="roundScreenAppAccount" placeholder="用户名/邮箱">
+                </div>
+                <div class="round-screen-form-group">
+                    <label>密码</label>
+                    <input type="password" id="roundScreenAppPassword" placeholder="密码">
+                </div>
+                <div class="round-screen-form-group">
+                    <label>备注</label>
+                    <textarea id="roundScreenAppNotes" placeholder="备注"></textarea>
+                </div>
+                <div class="round-screen-modal-actions">
+                    <button type="button" class="round-screen-modal-btn cancel" onclick="closeRoundScreenModal()">取消</button>
+                    <button type="submit" class="round-screen-modal-btn save">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal">
+            <h2 id="modalTitle">添加密码</h2>
+            <form id="passwordForm" onsubmit="savePassword(event)">
+                <input type="hidden" id="editId">
+                <div class="form-group icon-upload-group">
+                    <label>应用图标</label>
+                    <div class="icon-upload-wrapper">
+                        <div class="icon-preview" id="iconPreview">
+                            <span class="icon-placeholder">📱</span>
+                        </div>
+                        <input type="file" id="iconInput" accept="image/*" class="icon-input-hidden" onchange="previewIcon(this)">
+                        <button type="button" class="icon-upload-btn" onclick="document.getElementById('iconInput').click()">上传图标</button>
+                        <button type="button" class="icon-remove-btn" id="iconRemoveBtn" onclick="removeIcon()" style="display:none;">删除</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>应用名称 *</label>
+                    <input type="text" id="appName" placeholder="例如：微信、支付宝" required>
+                </div>
+                <div class="form-group">
+                    <label>应用账号</label>
+                    <input type="text" id="appAccount" placeholder="用户名/邮箱/手机号">
+                </div>
+                <div class="form-group">
+                    <label>应用密码</label>
+                    <input type="password" id="appPassword" placeholder="请输入密码">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="appNotes" placeholder="其他备注信息"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn cancel" onclick="closeModal()">取消</button>
+                    <button type="submit" class="modal-btn save">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="copy-toast" id="copyToast">已复制到剪贴板</div>
+
+    <div class="lock-screen" id="lockScreen" style="display: none;">
+        <h2>🔐 解锁</h2>
+        
+        <div class="lock-input" id="lockInput">****</div>
+        
+        <div class="number-pad" id="numberPad">
+            <button class="number-btn" onclick="inputNumber('1')">1</button>
+            <button class="number-btn" onclick="inputNumber('2')">2</button>
+            <button class="number-btn" onclick="inputNumber('3')">3</button>
+            <button class="number-btn" onclick="inputNumber('4')">4</button>
+            <button class="number-btn" onclick="inputNumber('5')">5</button>
+            <button class="number-btn" onclick="inputNumber('6')">6</button>
+            <button class="number-btn" onclick="inputNumber('7')">7</button>
+            <button class="number-btn" onclick="inputNumber('8')">8</button>
+            <button class="number-btn" onclick="inputNumber('9')">9</button>
+            <button class="number-btn" style="visibility: hidden;"></button>
+            <button class="number-btn" onclick="inputNumber('0')">0</button>
+            <button class="number-btn delete" onclick="deleteNumber()">⌫</button>
+        </div>
+        
+        <div class="lock-error" id="lockError"></div>
+    </div>
+
+    <script>
+        let passwords = JSON.parse(localStorage.getItem('passwords')) || [];
+        let currentEditId = null;
+        let currentIconData = null;
+        let currentLockInput = '';
+
+        function saveToStorage() {
+            localStorage.setItem('passwords', JSON.stringify(passwords));
+        }
+
+        function initZoom() {
+            const savedZoom = localStorage.getItem('pageZoom') || '100';
+            applyZoom(savedZoom);
+        }
+
+        function adjustZoom(delta) {
+            const currentZoom = parseInt(localStorage.getItem('pageZoom')) || 100;
+            let newZoom = currentZoom + delta;
+            newZoom = Math.max(50, Math.min(200, newZoom));
+            localStorage.setItem('pageZoom', newZoom);
+            applyZoom(newZoom);
+        }
+
+        function applyZoom(value) {
+            document.getElementById('zoomValue').textContent = value + '%';
+            document.body.style.zoom = value / 100;
+        }
+
+        function initLock() {
+            const isLocked = localStorage.getItem('lockEnabled') === 'true';
+            
+            document.getElementById('lockToggle').checked = isLocked;
+            
+            if (isLocked) {
+                showLockScreen();
+            }
+        }
+
+        function toggleLock() {
+            const isLocked = document.getElementById('lockToggle').checked;
+            localStorage.setItem('lockEnabled', isLocked);
+            
+            if (isLocked) {
+                const hasPassword = localStorage.getItem('lockPassword');
+                if (!hasPassword) {
+                    alert('请先设置数字密码');
+                    document.getElementById('lockToggle').checked = false;
+                    localStorage.setItem('lockEnabled', 'false');
+                    return;
+                }
+            }
+        }
+
+        function showLockScreen() {
+            document.getElementById('lockScreen').style.display = 'flex';
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('roundScreenMode').style.display = 'none';
+            resetLockInput();
+        }
+
+        function hideLockScreen() {
+            document.getElementById('lockScreen').style.display = 'none';
+            const isRoundScreen = localStorage.getItem('roundScreenMode') === 'true';
+            if (isRoundScreen) {
+                document.getElementById('roundScreenMode').style.display = 'flex';
+            } else {
+                document.getElementById('mainContainer').style.display = 'block';
+            }
+        }
+
+        function resetLockInput() {
+            currentLockInput = '';
+            document.getElementById('lockInput').textContent = '****';
+            document.getElementById('lockError').textContent = '';
+        }
+
+        function inputNumber(num) {
+            if (currentLockInput.length < 4) {
+                currentLockInput += num;
+                updateLockDisplay();
+            }
+        }
+
+        function deleteNumber() {
+            currentLockInput = currentLockInput.slice(0, -1);
+            updateLockDisplay();
+        }
+
+        function updateLockDisplay() {
+            const display = currentLockInput.padEnd(4, '*');
+            document.getElementById('lockInput').textContent = display;
+            
+            if (currentLockInput.length === 4) {
+                checkLock();
+            }
+        }
+
+        function checkLock() {
+            const storedPassword = localStorage.getItem('lockPassword');
+            
+            if (currentLockInput === storedPassword) {
+                hideLockScreen();
+                resetLockInput();
+            } else {
+                document.getElementById('lockError').textContent = '密码错误，请重试';
+                setTimeout(() => {
+                    resetLockInput();
+                }, 1500);
+            }
+        }
+
+        function openSetLockModal() {
+            const newPassword = prompt('请设置4位数字密码');
+            
+            if (newPassword) {
+                if (/^\d{4}$/.test(newPassword)) {
+                    localStorage.setItem('lockPassword', newPassword);
+                    alert('数字密码设置成功');
+                } else {
+                    alert('请输入4位数字密码');
+                }
+            }
+        }
+
+        function initDarkMode() {
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            document.getElementById('darkModeToggle').checked = savedDarkMode;
+            if (savedDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.getElementById('darkModeToggle').checked;
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            localStorage.setItem('darkMode', isDark);
+        }
+
+        function initThemeColor() {
+            const savedPrimary = localStorage.getItem('primaryColor') || '#667eea';
+            const savedSecondary = localStorage.getItem('secondaryColor') || '#764ba2';
+            document.getElementById('primaryColorPicker').value = savedPrimary;
+            document.getElementById('secondaryColorPicker').value = savedSecondary;
+            applyThemeColor(savedPrimary, savedSecondary);
+        }
+
+        function applyThemeColor(primary = null, secondary = null) {
+            const primaryColor = primary || document.getElementById('primaryColorPicker').value;
+            const secondaryColor = secondary || document.getElementById('secondaryColorPicker').value;
+            
+            localStorage.setItem('primaryColor', primaryColor);
+            localStorage.setItem('secondaryColor', secondaryColor);
+            
+            const style = document.createElement('style');
+            style.id = 'theme-style';
+            style.textContent = `
+                :root {
+                    --primary-color: ${primaryColor};
+                    --secondary-color: ${secondaryColor};
+                }
+                body {
+                    background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%);
+                }
+                .add-btn {
+                    background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%);
+                }
+                .modal-content {
+                    background: linear-gradient(135deg, ${primaryColor}dd 0%, ${secondaryColor}dd 100%);
+                }
+                .round-screen-modal-content {
+                    background: linear-gradient(135deg, ${primaryColor}ff 0%, ${secondaryColor}ff 100%);
+                }
+                input:checked + .slider {
+                    background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%);
+                }
+                body:not(.dark-mode) .round-screen-mode {
+                    background: linear-gradient(135deg, ${primaryColor}e6 0%, ${secondaryColor}e6 100%);
+                    box-shadow: 0 0 60px ${primaryColor}80, inset 0 0 30px rgba(255,255,255,0.1);
+                }
+            `;
+            
+            const existingStyle = document.getElementById('theme-style');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            document.head.appendChild(style);
+        }
+
+        function previewIcon(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentIconData = e.target.result;
+                    const preview = document.getElementById('iconPreview');
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="图标预览">';
+                    document.getElementById('iconRemoveBtn').style.display = 'inline-block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeIcon() {
+            currentIconData = null;
+            const preview = document.getElementById('iconPreview');
+            preview.innerHTML = '<span class="icon-placeholder">📱</span>';
+            document.getElementById('iconInput').value = '';
+            document.getElementById('iconRemoveBtn').style.display = 'none';
+        }
+
+        function previewRoundScreenIcon(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentIconData = e.target.result;
+                    const preview = document.getElementById('roundScreenIconPreview');
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="图标预览">';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function openModal(editId = null) {
+            currentEditId = editId;
+            currentIconData = null;
+            const overlay = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('passwordForm');
+
+            if (editId) {
+                const item = passwords.find(p => p.id === editId);
+                title.textContent = '编辑密码';
+                document.getElementById('editId').value = editId;
+                document.getElementById('appName').value = item.appName || '';
+                document.getElementById('appAccount').value = item.appAccount || '';
+                document.getElementById('appPassword').value = item.appPassword || '';
+                document.getElementById('appNotes').value = item.appNotes || '';
+                if (item.icon) {
+                    currentIconData = item.icon;
+                    const preview = document.getElementById('iconPreview');
+                    preview.innerHTML = '<img src="' + item.icon + '" alt="图标预览">';
+                    document.getElementById('iconRemoveBtn').style.display = 'inline-block';
+                } else {
+                    removeIcon();
+                }
+            } else {
+                title.textContent = '添加密码';
+                form.reset();
+                document.getElementById('editId').value = '';
+                removeIcon();
+            }
+
+            overlay.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            currentEditId = null;
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeModal();
+            }
+        }
+
+        function savePassword(event) {
+            event.preventDefault();
+
+            const appName = document.getElementById('appName').value.trim();
+            const appAccount = document.getElementById('appAccount').value.trim();
+            const appPassword = document.getElementById('appPassword').value;
+            const appNotes = document.getElementById('appNotes').value.trim();
+            const editId = document.getElementById('editId').value;
+
+            if (!appName) {
+                alert('请输入应用名称');
+                return;
+            }
+
+            if (editId) {
+                const index = passwords.findIndex(p => p.id === editId);
+                if (index !== -1) {
+                    const oldPassword = passwords[index].appPassword;
+                    if (appPassword && appPassword !== oldPassword) {
+                        if (!passwords[index].history) {
+                            passwords[index].history = [];
+                        }
+                        if (oldPassword) {
+                            passwords[index].history.unshift({
+                                password: oldPassword,
+                                date: passwords[index].updatedAt || new Date().toISOString()
+                            });
+                        }
+                    }
+                    passwords[index] = {
+                        ...passwords[index],
+                        appName,
+                        appAccount,
+                        appPassword,
+                        appNotes,
+                        icon: currentIconData || passwords[index].icon,
+                        updatedAt: new Date().toISOString()
+                    };
+                }
+            } else {
+                const newPassword = {
+                    id: Date.now().toString(),
+                    appName,
+                    appAccount,
+                    appPassword,
+                    appNotes,
+                    icon: currentIconData,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    history: []
+                };
+                passwords.push(newPassword);
+            }
+
+            saveToStorage();
+            closeModal();
+            renderPasswords();
+        }
+
+        function deletePassword(id) {
+            if (confirm('确定要删除这条密码记录吗？')) {
+                passwords = passwords.filter(p => p.id !== id);
+                saveToStorage();
+                renderPasswords();
+            }
+        }
+
+        function togglePassword(element) {
+            const passwordEl = element.closest('.field-value').querySelector('.password-dots');
+            if (passwordEl.dataset.visible === 'true') {
+                passwordEl.textContent = '•'.repeat(8);
+                passwordEl.dataset.visible = 'false';
+            } else {
+                passwordEl.textContent = passwordEl.dataset.password;
+                passwordEl.dataset.visible = 'true';
+            }
+        }
+
+        function copyToClipboard(text, field) {
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const isRoundScreen = document.getElementById('roundScreenToggle').checked;
+                if (isRoundScreen) {
+                    const toast = document.getElementById('roundScreenToast');
+                    toast.textContent = field === 'password' ? '密码已复制' : '已复制';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 1500);
+                } else {
+                    const toast = document.getElementById('copyToast');
+                    toast.textContent = field === 'password' ? '密码已复制' : '已复制到剪贴板';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                }
+            });
+        }
+
+        function toggleHistory(element) {
+            const list = element.closest('.history-section').querySelector('.history-list');
+            list.classList.toggle('show');
+            element.querySelector('.arrow').textContent = list.classList.contains('show') ? '▲' : '▼';
+        }
+
+        function filterPasswords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.password-card');
+            cards.forEach(card => {
+                const appName = card.querySelector('.app-name').textContent.toLowerCase();
+                card.style.display = appName.includes(searchTerm) ? 'block' : 'none';
+            });
+        }
+
+        function filterRoundScreenPasswords() {
+            const searchTerm = document.getElementById('roundScreenSearchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.round-screen-card');
+            cards.forEach(card => {
+                const appName = card.querySelector('.round-screen-card-title').textContent.toLowerCase();
+                card.style.display = appName.includes(searchTerm) ? 'block' : 'none';
+            });
+        }
+
+        function renderPasswords() {
+            const list = document.getElementById('passwordList');
+
+            if (passwords.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔐</div>
+                        <div class="empty-state-text">还没有添加任何密码<br>点击按钮开始添加</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedPasswords = [...passwords].sort((a, b) =>
+                new Date(b.updatedAt) - new Date(a.updatedAt)
+            );
+
+            list.innerHTML = sortedPasswords.map(item => {
+                const maskedPassword = '•'.repeat(8);
+                const historyHtml = item.history && item.history.length > 0 ? `
+                    <div class="history-section">
+                        <div class="history-toggle" onclick="toggleHistory(this)">
+                            <span class="arrow">▼</span>
+                            历史密码 (${item.history.length})
+                        </div>
+                        <div class="history-list">
+                            ${item.history.map(h => `
+                                <div class="history-item">
+                                    <div class="date">${new Date(h.date).toLocaleString('zh-CN')}</div>
+                                    <div>${h.password}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="password-card">
+                        <div class="card-header">
+                            <div class="app-name">
+                                ${item.icon ? '<img class="app-icon" src="' + item.icon + '" alt="图标">' : '<div class="app-icon">📱</div>'}
+                                ${item.appName}
+                            </div>
+                            <div class="card-actions">
+                                <button class="action-btn" onclick="openModal('${item.id}')" title="编辑">✏️</button>
+                                <button class="action-btn delete" onclick="deletePassword('${item.id}')" title="删除">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="field">
+                                <div class="field-label">账号</div>
+                                <div class="field-value">
+                                    ${item.appAccount || '-'}
+                                    ${item.appAccount ? '<button class="action-btn" style="width:28px;height:28px;border-radius:6px;font-size:0.8em" onclick="copyToClipboard(\'' + item.appAccount + '\', \'account\')">📋</button>' : ''}
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label">密码</div>
+                                <div class="field-value password-field">
+                                    <span class="password-dots" data-password="${item.appPassword || ''}" data-visible="false" onclick="togglePassword(this)">${item.appPassword ? maskedPassword : '-'}</span>
+                                    ${item.appPassword ? '<button class="action-btn" style="width:28px;height:28px;border-radius:6px;font-size:0.8em" onclick="copyToClipboard(\'' + item.appPassword.replace(/'/g, "\\'") + '\', \'password\')">📋</button>' : ''}
+                                </div>
+                            </div>
+                            ${item.appNotes ? `
+                                <div class="field" style="grid-column: 1 / -1;">
+                                    <div class="field-label">备注</div>
+                                    <div class="field-value">${item.appNotes}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        ${historyHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeSettings();
+                closeRoundScreenModal();
+            }
+        });
+
+        function openSettings() {
+            document.getElementById('settingsPanel').classList.add('show');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsPanel').classList.remove('show');
+        }
+
+        function closeSettingsOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeSettings();
+            }
+        }
+
+        function toggleRoundScreen() {
+            const isRoundScreen = document.getElementById('roundScreenToggle').checked;
+            if (isRoundScreen) {
+                document.getElementById('mainContainer').style.display = 'none';
+                document.getElementById('roundScreenMode').classList.add('show');
+                document.body.classList.add('round-screen-active');
+                renderRoundScreenList();
+            } else {
+                document.getElementById('mainContainer').style.display = 'block';
+                document.getElementById('roundScreenMode').classList.remove('show');
+                document.body.classList.remove('round-screen-active');
+            }
+            localStorage.setItem('roundScreenMode', isRoundScreen);
+        }
+
+        function renderRoundScreenList() {
+            const list = document.getElementById('roundScreenList');
+            const sortedPasswords = [...passwords].sort((a, b) =>
+                new Date(b.updatedAt) - new Date(a.updatedAt)
+            );
+
+            if (sortedPasswords.length === 0) {
+                list.innerHTML = `
+                    <div class="round-screen-empty">
+                        <div class="round-screen-empty-icon">🔐</div>
+                        <div>暂无密码</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = sortedPasswords.map(item => `
+                <div class="round-screen-card">
+                    <div class="round-screen-card-header">
+                        <div class="round-screen-card-title">${item.icon ? '<img class="round-screen-card-icon" src="' + item.icon + '" alt="图标">' : '📱'} ${item.appName}</div>
+                        <div class="round-screen-card-actions">
+                            <button class="round-screen-action-btn" onclick="editRoundScreenPassword('${item.id}')" title="编辑">✏️</button>
+                            <button class="round-screen-action-btn delete" onclick="deleteRoundScreenPassword('${item.id}')" title="删除">🗑️</button>
+                        </div>
+                    </div>
+                    ${item.appAccount ? `
+                        <div class="round-screen-field">
+                            <div class="round-screen-field-label">账号</div>
+                            <div class="round-screen-field-value">${item.appAccount}<button class="round-screen-copy-btn" onclick="copyToClipboard('${item.appAccount}', 'account')">📋</button></div>
+                        </div>
+                    ` : ''}
+                    ${item.appPassword ? `
+                        <div class="round-screen-field">
+                            <div class="round-screen-field-label">密码</div>
+                            <div class="round-screen-field-value">••••••••<button class="round-screen-copy-btn" onclick="copyToClipboard('${item.appPassword.replace(/'/g, "\\'")}', 'password')">📋</button></div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function openRoundScreenModal(editId = null) {
+            const form = document.getElementById('roundScreenForm');
+            form.reset();
+            document.getElementById('roundScreenEditId').value = '';
+            currentIconData = null;
+
+            const preview = document.getElementById('roundScreenIconPreview');
+            preview.innerHTML = '<span class="icon-placeholder">📱</span>';
+
+            if (editId) {
+                const item = passwords.find(p => p.id === editId);
+                document.getElementById('roundScreenModalTitle').textContent = '编辑密码';
+                document.getElementById('roundScreenEditId').value = editId;
+                document.getElementById('roundScreenAppName').value = item.appName || '';
+                document.getElementById('roundScreenAppAccount').value = item.appAccount || '';
+                document.getElementById('roundScreenAppPassword').value = item.appPassword || '';
+                document.getElementById('roundScreenAppNotes').value = item.appNotes || '';
+                if (item.icon) {
+                    currentIconData = item.icon;
+                    preview.innerHTML = '<img src="' + item.icon + '" alt="图标预览">';
+                }
+            } else {
+                document.getElementById('roundScreenModalTitle').textContent = '添加密码';
+            }
+
+            document.getElementById('roundScreenModal').classList.add('show');
+        }
+
+        function closeRoundScreenModal() {
+            document.getElementById('roundScreenModal').classList.remove('show');
+        }
+
+        function closeRoundScreenModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeRoundScreenModal();
+            }
+        }
+
+        function editRoundScreenPassword(id) {
+            openRoundScreenModal(id);
+        }
+
+        function deleteRoundScreenPassword(id) {
+            if (confirm('确定要删除这条密码记录吗？')) {
+                passwords = passwords.filter(p => p.id !== id);
+                saveToStorage();
+                renderRoundScreenList();
+            }
+        }
+
+        function saveRoundScreenPassword(event) {
+            event.preventDefault();
+
+            const appName = document.getElementById('roundScreenAppName').value.trim();
+            const appAccount = document.getElementById('roundScreenAppAccount').value.trim();
+            const appPassword = document.getElementById('roundScreenAppPassword').value;
+            const appNotes = document.getElementById('roundScreenAppNotes').value.trim();
+            const editId = document.getElementById('roundScreenEditId').value;
+
+            if (!appName) {
+                alert('请输入应用名称');
+                return;
+            }
+
+            if (editId) {
+                const index = passwords.findIndex(p => p.id === editId);
+                if (index !== -1) {
+                    passwords[index] = {
+                        ...passwords[index],
+                        appName,
+                        appAccount,
+                        appPassword,
+                        appNotes,
+                        ...(currentIconData && { icon: currentIconData }),
+                        updatedAt: new Date().toISOString()
+                    };
+                }
+            } else {
+                passwords.push({
+                    id: Date.now().toString(),
+                    appName,
+                    appAccount,
+                    appPassword,
+                    appNotes,
+                    icon: currentIconData || null,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    history: []
+                });
+            }
+            currentIconData = null;
+
+            saveToStorage();
+            closeRoundScreenModal();
+            renderRoundScreenList();
+        }
+
+        function initRoundScreenMode() {
+            const savedMode = localStorage.getItem('roundScreenMode') === 'true';
+            document.getElementById('roundScreenToggle').checked = savedMode;
+            if (savedMode) {
+                document.getElementById('mainContainer').style.display = 'none';
+                document.getElementById('roundScreenMode').classList.add('show');
+                document.body.classList.add('round-screen-active');
+                renderRoundScreenList();
+            }
+        }
+
+        function exitRoundScreenMode() {
+            document.getElementById('roundScreenToggle').checked = false;
+            document.getElementById('mainContainer').style.display = 'block';
+            document.getElementById('roundScreenMode').classList.remove('show');
+            document.body.classList.remove('round-screen-active');
+            localStorage.setItem('roundScreenMode', 'false');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPasswords();
+            initRoundScreenMode();
+            initDarkMode();
+            initThemeColor();
+            initZoom();
+            initLock();
+        });
+    </script>
+</body>
+</html>
